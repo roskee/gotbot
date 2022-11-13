@@ -8,8 +8,8 @@ import (
 // Update holds values from an update sent by the telegram server.
 // // incomplete //
 type Update struct {
-	UpdateID int64 `json:"update_id"`
-	Message  Message
+	UpdateID int64    `json:"update_id"`
+	Message  *Message `json:"message"`
 }
 
 // FromJSONBody modifies the current Update with matching values in body

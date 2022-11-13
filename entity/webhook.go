@@ -6,8 +6,8 @@ import (
 )
 
 type Webhook struct {
-	URL       string `json:"url"`
-	IPAddress string `json:"ip_address"`
+	URL       string `json:"url,omitempty"`
+	IPAddress string `json:"ip_address,omitempty"`
 }
 
 // FromJSONBody modifies the current Webhook with matching values in body

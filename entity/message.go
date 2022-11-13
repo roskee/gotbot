@@ -3,14 +3,15 @@ package entity
 import "strings"
 
 // Message holds a message object the telegram server sends.
-// // incomplete //
+//
+// TODO: incomplete
 type Message struct {
-	MessageID      int64    `json:"message_id"`
-	From           User     `json:"from"`
-	Date           int64    `json:"date"`
-	ForwardFrom    User     `json:"forward_from"`
-	ReplyToMessage *Message `json:"reply_to_message"`
-	Text           string   `json:"text"`
+	MessageID      int64    `json:"message_id,omitempty"`
+	From           User     `json:"from,omitempty"`
+	Date           int64    `json:"date,omitempty"`
+	ForwardFrom    User     `json:"forward_from,omitempty"`
+	ReplyToMessage *Message `json:"reply_to_message,omitempty"`
+	Text           string   `json:"text,omitempty"`
 }
 
 // GetCommand checks if this message has Text starting with '/'.
