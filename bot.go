@@ -1,11 +1,11 @@
-package bot
+package gotbot
 
 import (
-	"bot/entity"
-	"bot/router"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"gotbot/entity"
+	"gotbot/router"
 	"io"
 	"log"
 	"net/http"

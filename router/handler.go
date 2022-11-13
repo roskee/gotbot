@@ -1,8 +1,6 @@
 package router
 
-import (
-	"bot/entity"
-)
+import "gotbot/entity"
 
 // Handler is an abstract to hold a certain bot command and its implementation
 type Handler struct {

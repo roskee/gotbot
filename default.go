@@ -1,8 +1,8 @@
-package bot
+package gotbot
 
 import (
-	"bot/entity"
 	"encoding/json"
+	"gotbot/entity"
 )
 
 // GetMe is the implementation of the builtin getMe function of the bot
