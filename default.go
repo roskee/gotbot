@@ -2,7 +2,7 @@ package gotbot
 
 import (
 	"encoding/json"
-	"gotbot/entity"
+	"github.com/roskee/gotbot/entity"
 )
 
 // GetMe is the implementation of the builtin getMe function of the bot
