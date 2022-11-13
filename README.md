@@ -43,8 +43,8 @@ Then you can use the `RegisterMethod` to register your first command.
 
 ```go
 err := bot.RegisterMethod("start", "start command", func(update entity.Update) {
-fmt.Println("start command was sent")
-// do you thing... maybe reply to the user
+    fmt.Println("start command was sent")
+    // do you thing... maybe reply to the user
 })
 ```
 
@@ -75,5 +75,5 @@ webhook := entity.Webhook{
 err = bot.Listen(webhook)
 ```
 
-**Best Wishes!**  
-*Kirubel Adamu*
+**<div align="right">Best Wishes!</div>**
+*<div align="right">Kirubel Adamu</div>*
