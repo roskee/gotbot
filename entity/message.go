@@ -47,3 +47,34 @@ func (m *Message) GetCommand() string {
 	}
 	return m.Text[1:index]
 }
+
+// MessageEntity  represents one special entity in a text message.
+// For example, hashtags, usernames, URLs, etc.
+type MessageEntity struct {
+	// Type is Type of the entity.
+	// Currently, can be “mention” (@username), “hashtag” (#hashtag), “cashtag” ($USD),
+	// “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org),
+	// “phone_number” (+1-212-555-0123), “bold” (bold text), “italic” (italic text),
+	// “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message),
+	// “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs),
+	// “text_mention” (for users without usernames), “custom_emoji” (for inline custom emoji stickers)
+	//
+	// It is a required field
+	Type string `json:"type,omitempty"`
+	// Offset is offset in UTF-16 code units to the start of the entity.
+	//
+	// It is a required field
+	Offset int64 `json:"offset,omitempty"`
+	// Length is length of the entity in UTF-16 code units.
+	//
+	// It is a required field
+	Length int64 `json:"length,omitempty"`
+	// URL is, for “text_link” only, URL that will be opened after user taps on the text.
+	URL string `json:"url,omitempty"`
+	// User is, for “text_mention” only, the mentioned user.
+	User *User `json:"user,omitempty"`
+	// Language is, for “pre” only, the programming language of the entity text.
+	Language string `json:"language,omitempty"`
+	// CustomEmojiID is, for “custom_emoji” only, unique identifier of the custom emoji.
+	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
+}
