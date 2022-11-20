@@ -9,8 +9,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 )
 
@@ -38,7 +36,7 @@ type Bot interface {
 
 	// Listen creates a http server to listen for updates as a webhook handler.
 	// It returns on failure only
-	Listen(webhook entity.Webhook) error
+	Listen(port int, webhook entity.Webhook, config entity.UpdateConfig) error
 
 	// Poll initiates a manual poll to get updates from the telegram server.
 	// instructions on what to do on the updates should be set on config.
@@ -129,34 +127,34 @@ func (b *bot) executeMethod(name string, update entity.Update) {
 
 // Listen creates a http server to listen for updates as a webhook handler.
 // It returns on failure only
-func (b *bot) Listen(webhook entity.Webhook) error {
+func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfig) error {
 	_, err := b.SendRawRequest("POST", "setWebhook", webhook)
 	if err != nil {
 		return err
 	}
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "5000"
-	}
-	return http.ListenAndServe(fmt.Sprintf(":%s", port), http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		path := req.URL.Path
-		if !strings.Contains(path, b.apiKey) {
-			res.WriteHeader(401)
+
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		// check token
+		if webhook.SecretToken != req.Header.Get("X-Telegram-Bot-Api-Secret-Token") {
+			log.Printf("invalid secret token: %v", req.Header.Get("X-Telegram-Bot-Api-Secret-Token"))
+			res.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			res.WriteHeader(400)
 			return
 		}
+
 		var update entity.Update
 		err = json.Unmarshal(body, &update)
 		if err != nil {
 			res.WriteHeader(500)
 			return
 		}
-		log.Printf("New Text Message: %+v\n", update.Message.Text)
-		b.executeMethod(update.Message.GetCommand(), update)
+
+		b.executeUpdate(update, config)
 		res.WriteHeader(200)
 	}))
 }
@@ -183,42 +181,46 @@ func (b *bot) Poll(duration time.Duration, config entity.UpdateConfig) error {
 			continue
 		}
 		for _, update := range updates {
-			if update.Message != nil {
-				if command := update.Message.GetCommand(); command != "" {
-					b.executeMethod(command, update)
-					log.Printf("%s command executed", command)
-				}
-				if config.OnMessage != nil {
-					config.OnMessage(*update.Message)
-				}
-			} else if update.EditedMessage != nil {
-				if config.OnEditedMessage != nil {
-					config.OnEditedMessage(*update.EditedMessage)
-				}
-			} else if update.ChannelPost != nil {
-				if config.OnChannelPost != nil {
-					config.OnChannelPost(*update.ChannelPost)
-				}
-			} else if update.EditedChannelPost != nil {
-				if config.OnEditedChannelPost != nil {
-					config.OnEditedChannelPost(*update.EditedChannelPost)
-				}
-			} else if update.InlineQuery != nil {
-				if config.OnInlineQuery != nil {
-					config.OnInlineQuery(*update.InlineQuery)
-				}
-			} else if update.ChosenInlineResult != nil {
-				if config.OnChosenInlineResult != nil {
-					config.OnChosenInlineResult(*update.ChosenInlineResult)
-				}
-			} else if update.CallbackQuery != nil {
-				if config.OnCallbackQuery != nil {
-					config.OnCallbackQuery(*update.CallbackQuery)
-				}
-			} else { // TODO: missing update types
-				log.Printf("unknown update: %+v", update)
-			}
+			b.executeUpdate(update, config)
 			lastUpdate = update
 		}
+	}
+}
+
+func (b *bot) executeUpdate(update entity.Update, config entity.UpdateConfig) {
+	if update.Message != nil {
+		if command := update.Message.GetCommand(); command != "" {
+			b.executeMethod(command, update)
+			log.Printf("%s command executed", command)
+		}
+		if config.OnMessage != nil {
+			config.OnMessage(*update.Message)
+		}
+	} else if update.EditedMessage != nil {
+		if config.OnEditedMessage != nil {
+			config.OnEditedMessage(*update.EditedMessage)
+		}
+	} else if update.ChannelPost != nil {
+		if config.OnChannelPost != nil {
+			config.OnChannelPost(*update.ChannelPost)
+		}
+	} else if update.EditedChannelPost != nil {
+		if config.OnEditedChannelPost != nil {
+			config.OnEditedChannelPost(*update.EditedChannelPost)
+		}
+	} else if update.InlineQuery != nil {
+		if config.OnInlineQuery != nil {
+			config.OnInlineQuery(*update.InlineQuery)
+		}
+	} else if update.ChosenInlineResult != nil {
+		if config.OnChosenInlineResult != nil {
+			config.OnChosenInlineResult(*update.ChosenInlineResult)
+		}
+	} else if update.CallbackQuery != nil {
+		if config.OnCallbackQuery != nil {
+			config.OnCallbackQuery(*update.CallbackQuery)
+		}
+	} else { // TODO: missing update types
+		log.Printf("unknown update: %+v", update)
 	}
 }

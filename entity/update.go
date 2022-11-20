@@ -5,6 +5,23 @@ import (
 	"log"
 )
 
+const (
+	UpdateMessage            = "message"
+	UpdateEditedMessage      = "edited_message"
+	UpdateChannelPost        = "channel_post"
+	UpdateEditedChannelPost  = "edited_channel_post"
+	UpdateInlineQuery        = "inline_query"
+	UpdateChosenInlineResult = "chosen_inline_result"
+	UpdateCallbackQuery      = "callback_query"
+	UpdateShippingQuery      = "shipping_query"
+	UpdatePreCheckoutQuery   = "pre_checkout_query"
+	UpdatePoll               = "poll"
+	UpdatePollAnswer         = "poll_answer"
+	UpdateMyChatMember       = "my_chat_member"
+	UpdateChatMember         = "chat_member"
+	UpdateChatJoinRequest    = "chat_join_request"
+)
+
 // Update holds values from an update sent by the telegram server.
 // At most one of the optional parameters can be present in any given update.
 // // incomplete //

@@ -72,7 +72,7 @@ This method only works with [these security configurations](https://core.telegra
 webhook := entity.Webhook{
     URL: "https://myurl.com/updatesCallback",
 }
-err = bot.Listen(webhook)
+err = bot.Listen(5000, webhook, entity.UpdateConfig{})
 ```
 
 **<div align="right">Best Wishes!</div>**
