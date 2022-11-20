@@ -3,11 +3,12 @@ package gotbot
 import (
 	"encoding/json"
 	"github.com/roskee/gotbot/entity"
+	"net/http"
 )
 
 // GetMe is the implementation of the builtin getMe function of the bot
 func (b *bot) GetMe() (entity.User, error) {
-	body, err := b.SendRawRequest("GET", "getMe", nil)
+	body, err := b.SendRawRequest(http.MethodGet, "getMe", nil)
 	if err != nil {
 		return entity.User{}, err
 	}
@@ -19,7 +20,7 @@ func (b *bot) GetMe() (entity.User, error) {
 // GetMyCommands is the implementation of the builtin getMyCommands function of the bot.
 // It returns the list of all currently registered commands
 func (b *bot) GetMyCommands() ([]entity.Command, error) {
-	cmdsJSON, err := b.SendRawRequest("GET", "getMyCommands", nil)
+	cmdsJSON, err := b.SendRawRequest(http.MethodGet, "getMyCommands", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +34,7 @@ func (b *bot) GetMyCommands() ([]entity.Command, error) {
 // setMyCommands is the implementation of the builtin setMyCommands function of the bot.
 // It sets the given commands as the bot's command
 func (b *bot) setMyCommands(commands []entity.Command) error {
-	_, err := b.SendRawRequest("POST", "setMyCommands", entity.Commands{
+	_, err := b.SendRawRequest(http.MethodPost, "setMyCommands", entity.Commands{
 		Commands: commands,
 	})
 	if err != nil {
@@ -45,11 +46,16 @@ func (b *bot) setMyCommands(commands []entity.Command) error {
 // SendMessage is the implementation of the builtin sendMessage function of the bot.
 // It sends the given message to the sender user
 func (b *bot) SendMessage(message entity.MessageEnvelop) (entity.Message, error) {
-	body, err := b.SendRawRequest("POST", "sendMessage", message)
+	body, err := b.SendRawRequest(http.MethodPost, "sendMessage", message)
 	if err != nil {
 		return entity.Message{}, err
 	}
 	var msg entity.Message
 	err = json.Unmarshal(body, &msg)
 	return msg, err
+}
+
+func (b *bot) AnswerCallbackQuery(options entity.AnswerCallbackQueryEntity) error {
+	_, err := b.SendRawRequest(http.MethodPost, "answerCallbackQuery", options)
+	return err
 }

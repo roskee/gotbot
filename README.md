@@ -60,7 +60,7 @@ you can call `getUpdates` method periodically to get all user interactions since
 your server will indefinitely (with the given interval) ask the telegram bot api for new updates.
 
 ```go
-err = bot.Poll(5 * time.Second)
+err = bot.Poll(5 * time.Second, entity.UpdateConfig{})
 ```
 
 #### webhook

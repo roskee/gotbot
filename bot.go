@@ -41,8 +41,14 @@ type Bot interface {
 	Listen(webhook entity.Webhook) error
 
 	// Poll initiates a manual poll to get updates from the telegram server.
+	// instructions on what to do on the updates should be set on config.
+	// note that registered methods are automatically called.
+	//
 	// It returns on failure only
-	Poll(duration time.Duration) error
+	Poll(duration time.Duration, configs entity.UpdateConfig) error
+
+	// AnswerCallbackQuery send answers to callback queries sent from entity.InlineKeyboardMarkup.
+	AnswerCallbackQuery(options entity.AnswerCallbackQueryEntity) error
 }
 
 // bot is in-package implementation of the Bot interface
@@ -156,8 +162,11 @@ func (b *bot) Listen(webhook entity.Webhook) error {
 }
 
 // Poll initiates a manual poll to get updates from the telegram server.
+// instructions on what to do on the updates should be set on config.
+// note that registered methods are automatically called.
+//
 // It returns on failure only
-func (b *bot) Poll(duration time.Duration) error {
+func (b *bot) Poll(duration time.Duration, config entity.UpdateConfig) error {
 	log.Printf("Polling with duration %v", duration)
 	var lastUpdate entity.Update
 	for {
@@ -174,9 +183,42 @@ func (b *bot) Poll(duration time.Duration) error {
 			continue
 		}
 		for _, update := range updates {
-			fmt.Printf("New Text Message: %+v\n", update.Message.Text)
+			if update.Message != nil {
+				if command := update.Message.GetCommand(); command != "" {
+					b.executeMethod(command, update)
+					log.Printf("%s command executed", command)
+				}
+				if config.OnMessage != nil {
+					config.OnMessage(*update.Message)
+				}
+			} else if update.EditedMessage != nil {
+				if config.OnEditedMessage != nil {
+					config.OnEditedMessage(*update.EditedMessage)
+				}
+			} else if update.ChannelPost != nil {
+				if config.OnChannelPost != nil {
+					config.OnChannelPost(*update.ChannelPost)
+				}
+			} else if update.EditedChannelPost != nil {
+				if config.OnEditedChannelPost != nil {
+					config.OnEditedChannelPost(*update.EditedChannelPost)
+				}
+			} else if update.InlineQuery != nil {
+				if config.OnInlineQuery != nil {
+					config.OnInlineQuery(*update.InlineQuery)
+				}
+			} else if update.ChosenInlineResult != nil {
+				if config.OnChosenInlineResult != nil {
+					config.OnChosenInlineResult(*update.ChosenInlineResult)
+				}
+			} else if update.CallbackQuery != nil {
+				if config.OnCallbackQuery != nil {
+					config.OnCallbackQuery(*update.CallbackQuery)
+				}
+			} else { // TODO: missing update types
+				log.Printf("unknown update: %+v", update)
+			}
 			lastUpdate = update
-			b.executeMethod(update.Message.GetCommand(), update)
 		}
 	}
 }
