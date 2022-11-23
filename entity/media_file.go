@@ -182,7 +182,7 @@ type VideoNote struct {
 	FileSize int64 `json:"file_size,omitempty"`
 }
 
-// Voice
+// Voice represents a voice note.
 type Voice struct {
 	// FileID is identifier for this file, which can be used to download or reuse the file.
 	//
