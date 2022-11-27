@@ -1,0 +1,8 @@
+name: Proper Code
+on: [push]
+jobs:
+  golangci-lint:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v3
+     - uses: golangci/golangci-lint-action@v3.3.1
