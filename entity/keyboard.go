@@ -134,3 +134,41 @@ type CallbackGame struct {
 	// it is required if ChatID and MessageID are not specified.
 	InlineMessageID int64 `json:"inline_message_id,omitempty"`
 }
+
+// ReplyKeyboardRemove can be used such that upon receiving a message with this object,
+// Telegram clients will remove the current custom keyboard and display the default letter-keyboard.
+type ReplyKeyboardRemove struct {
+	// RemoveKeyboard requests clients to remove the custom keyboard
+	// (user will not be able to summon this keyboard.)
+	RemoveKeyboard bool `json:"remove_keyboard,omitempty"`
+	// Selective can be true if you want to remove the keyboard for specific users only.
+	//
+	// Targets:
+	//
+	// 1) users that are @mentioned in the text of the Message object;
+	//
+	// 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
+	Selective bool `json:"selective,omitempty"`
+}
+
+// ForceReply can be used such that upon receiving a message with this object,
+// Telegram clients will display a reply interface to the user
+// (act as if the user has selected the bot's message and tapped 'Reply').
+type ForceReply struct {
+	// ForceReply shows reply interface to the user,
+	// as if they manually selected the bot's message and tapped 'Reply'.
+	//
+	// It is a required field.
+	ForceReply bool `json:"force_reply,omitempty"`
+	// InputFieldPlaceholder is the placeholder to be shown in the input field when the reply is active;
+	// 1-64 characters.
+	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
+	// Selective can be used if you want to force reply from specific users only.
+	//
+	// Targets:
+	//
+	// 1) users that are @mentioned in the text of the Message object;
+	//
+	// 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
+	Selective bool `json:"selective,omitempty"`
+}
