@@ -29,9 +29,9 @@ type KeyboardButton struct {
 	// RequestLocation can be true to attach the user's location when this button is pressed
 	RequestLocation bool `json:"request_location,omitempty"`
 	// RequestPoll if specified, the user will be asked to create a poll and send it to the bot when the button is pressed
-	RequestPoll *KeyboardButtonPollType `json:"request_poll,omitempty,omitempty"`
+	RequestPoll *KeyboardButtonPollType `json:"request_poll,omitempty"`
 	// WebApp can be used to launch the specified web app
-	WebApp *WebAppInfo `json:"web_app,omitempty,omitempty"`
+	WebApp *WebAppInfo `json:"web_app,omitempty"`
 }
 
 // ReplyKeyboardMarkup represents a custom keyboard with reply options
@@ -70,9 +70,9 @@ type InlineKeyboardButton struct {
 	// CallbackData is a data to be sent in a callback query to the bot when button is pressed.
 	CallbackData string `json:"callback_data,omitempty"`
 	// WebApp is a description of the Web App that will be launched when the user presses the button.
-	WebApp *WebAppInfo `json:"web_app,omitempty,omitempty"`
+	WebApp *WebAppInfo `json:"web_app,omitempty"`
 	// LoginUrl is an HTTPS url used to automatically authorize the user.
-	LoginUrl *LoginUrl `json:"login_url,omitempty,omitempty"`
+	LoginUrl *LoginUrl `json:"login_url,omitempty"`
 	// SwitchInlineQuery if set, pressing the button will prompt the user to select one of their chats,
 	// open that chat and insert the bot's username and the specified inline query in the input field.
 	// May be empty, in which case just the bot's username will be inserted.
