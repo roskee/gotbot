@@ -1,8 +1,28 @@
 name: Proper Code
-on: [push]
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+  pull_request:
+permissions:
+  contents: read
 jobs:
-  golangci-lint:
-    runs-on: ubuntu-latest
+  golangci:
+    strategy:
+      matrix:
+        go: [1.19]
+        os: [macos-latest, windows-latest]
+    name: lint
+    runs-on: ${{ matrix.os }}
     steps:
-     - uses: actions/checkout@v3
-     - uses: golangci/golangci-lint-action@v3.3.1
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
+          version: latest
