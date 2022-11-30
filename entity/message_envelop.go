@@ -91,4 +91,9 @@ type MessageEnvelop struct {
 	Height int64 `json:"height,omitempty"`
 	// SupportsStreaming can be true if the uploaded media is suitable for streaming.
 	SupportsStreaming bool `json:"supports_streaming,omitempty"`
+	// Animation is the animation to send.
+	// Pass a file_id as String to send an animation that exists on the Telegram servers (recommended),
+	// pass an HTTP URL as a String for Telegram to get an animation from the Internet,
+	// or upload a new animation using multipart/form-data.
+	Animation any `json:"animation,omitempty"`
 }
