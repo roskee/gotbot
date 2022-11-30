@@ -38,4 +38,16 @@ type MessageEnvelop struct {
 		*ReplyKeyboardRemove
 		*ForceReply
 	} `json:"reply_markup,omitempty"`
+	// Photo is the photo to send.
+	// Pass a file_id as String to send a photo that exists on the Telegram servers (recommended),
+	// pass an HTTP URL as a String for Telegram to get a photo from the Internet,
+	// or upload a new photo using multipart/form-data.
+	//
+	// It is a required field
+	Photo any `json:"photo,omitempty"`
+	// Caption is the media caption
+	Caption string `json:"caption,omitempty"`
+	// CaptionEntities is list of special entities that appear in the caption,
+	// which can be specified instead of parse_mode.
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 }
