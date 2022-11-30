@@ -43,11 +43,29 @@ type MessageEnvelop struct {
 	// pass an HTTP URL as a String for Telegram to get a photo from the Internet,
 	// or upload a new photo using multipart/form-data.
 	//
-	// It is a required field
+	// It is a required field for sending a photo.
 	Photo any `json:"photo,omitempty"`
 	// Caption is the media caption
 	Caption string `json:"caption,omitempty"`
 	// CaptionEntities is list of special entities that appear in the caption,
 	// which can be specified instead of parse_mode.
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// Audio is the audio file to send.
+	// Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended),
+	// pass an HTTP URL as a String for Telegram to get an audio file from the Internet,
+	// or upload a new one using multipart/form-data.
+	//
+	// It is a required field for sending an audio.
+	Audio any `json:"audio,omitempty"`
+	// Duration of the media in seconds.
+	Duration int64 `json:"duration,omitempty"`
+	// Performer of the media
+	Performer string `json:"performer,omitempty"`
+	// Title is the track name
+	Title string `json:"title,omitempty"`
+	// Thumb is the thumbnail of the file sent.
+	// It should be in JPEG format and less than 200 kB in size.
+	// It's width and height should not exceed 320.
+	// Ignored if the file is not uploaded using multipart/form-data.
+	Thumb any `json:"thumb,omitempty"`
 }
