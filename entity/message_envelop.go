@@ -95,5 +95,25 @@ type MessageEnvelop struct {
 	// Pass a file_id as String to send an animation that exists on the Telegram servers (recommended),
 	// pass an HTTP URL as a String for Telegram to get an animation from the Internet,
 	// or upload a new animation using multipart/form-data.
+	//
+	// It is a required field for sending an animation.
 	Animation any `json:"animation,omitempty"`
+	// Voice is the audio file to send.
+	// Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
+	// pass an HTTP URL as a String for Telegram to get a file from the Internet,
+	// or upload a new one using multipart/form-data.
+	//
+	// It is a required field for sending a voice.
+	Voice any `json:"voice,omitempty"`
+	// VideoNote is the video note to send.
+	// Pass a file_id as String to send a video note that exists on the Telegram servers (recommended)
+	// or upload a new video using multipart/form-data.
+	// Sending video notes by a URL is currently unsupported.
+	//
+	// It is a required field for sending a video note.
+	VideoNote any `json:"video_note,omitempty"`
+	// Length is the media width and height, i.e. diameter of the video message.
+	Length int64 `json:"length,omitempty"`
+	// Media is an array of media messages to be sent, must include 2-10 items.
+	Media []InputMedia `json:"media,omitempty"`
 }
