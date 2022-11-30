@@ -72,8 +72,23 @@ type MessageEnvelop struct {
 	// Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
 	// pass an HTTP URL as a String for Telegram to get a file from the Internet,
 	// or upload a new one using multipart/form-data.
+	//
+	// It is a required field for sending a document.
 	Document any `json:"document,omitempty"`
 	// DisableContentTypeDetection disables automatic server-side content type detection
 	// for files uploaded using multipart/form-data.
 	DisableContentTypeDetection bool `json:"disable_content_type_detection,omitempty"`
+	// Video is the Video to send.
+	// Pass a file_id as String to send a video that exists on the Telegram servers (recommended),
+	// pass an HTTP URL as a String for Telegram to get a video from the Internet,
+	// or upload a new video using multipart/form-data.
+	//
+	// It is a required field for sending video.
+	Video any `json:"video,omitempty"`
+	// Width of the media
+	Width int64 `json:"width,omitempty"`
+	// Height of the media
+	Height int64 `json:"height,omitempty"`
+	// SupportsStreaming can be true if the uploaded media is suitable for streaming.
+	SupportsStreaming bool `json:"supports_streaming,omitempty"`
 }
