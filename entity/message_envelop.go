@@ -68,4 +68,12 @@ type MessageEnvelop struct {
 	// It's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
 	Thumb any `json:"thumb,omitempty"`
+	// Document is the document to send.
+	// Pass a file_id as String to send a file that exists on the Telegram servers (recommended),
+	// pass an HTTP URL as a String for Telegram to get a file from the Internet,
+	// or upload a new one using multipart/form-data.
+	Document any `json:"document,omitempty"`
+	// DisableContentTypeDetection disables automatic server-side content type detection
+	// for files uploaded using multipart/form-data.
+	DisableContentTypeDetection bool `json:"disable_content_type_detection,omitempty"`
 }
