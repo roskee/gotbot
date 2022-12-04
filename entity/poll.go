@@ -17,7 +17,7 @@ type Poll struct {
 	// TotalVoterCount is total number of users that voted in the poll
 	//
 	// It is a required field
-	TotalVoterCount int `json:"total_voter_count"`
+	TotalVoterCount int64 `json:"total_voter_count"`
 	// IsClosed is true, if the poll is closed
 	//
 	// It is a required field
@@ -35,15 +35,15 @@ type Poll struct {
 	// It is a required field
 	AllowsMultipleAnswers bool `json:"allows_multiple_answers"`
 	// CorrectOPtionID is  0-based identifier of the correct answer option.
-	CorrectOPtionID int `json:"correct_option_id"`
+	CorrectOPtionID int64 `json:"correct_option_id"`
 	// Explanation is text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters
 	Explanation string `json:"explanation"`
 	// ExplanationEntities is special entities like usernames, URLs, bot commands, etc.
 	ExplanationEntities []*MessageEntity `json:"explanation_entities"`
 	// OpenPeriod is amount of time in seconds the poll will be active after creation
-	OpenPeriod int `json:"open_period"`
+	OpenPeriod int64 `json:"open_period"`
 	// CloseDate is point in time (Unix timestamp) when the poll will be automatically closed
-	CloseDate int `json:"close_date"`
+	CloseDate int64 `json:"close_date"`
 }
 
 // PollOption contains information about one answer option in a poll.
@@ -55,5 +55,5 @@ type PollOption struct {
 	// VoterCount is  number of users that voted for this option
 	//
 	// It is q required field
-	VoterCount int `json:"voter_count"`
+	VoterCount int64 `json:"voter_count"`
 }
