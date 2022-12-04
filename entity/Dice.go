@@ -8,6 +8,6 @@ type Dice struct {
 	Emoji string `json:"emoji"`
 	// Value is value of the dice, 1-6 for “🎲”, “🎯” and “🎳” base emoji, 1-5 for “🏀” and “⚽” base emoji, 1-64 for “🎰” base emoji
 	//
-	// It is required field
+	// It is required field, but optional on sending dice using sendDice method
 	Value int64 `json:"value"`
 }
