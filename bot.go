@@ -1,7 +1,6 @@
 package gotbot
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/roskee/gotbot/entity"
@@ -18,7 +17,7 @@ var apiString = "https://api.telegram.org/bot%s/%s"
 type Bot interface {
 
 	// SendRawRequest sends a request to the telegram server and returns the result part of the response as a serialized json body
-	SendRawRequest(httpMethod, function string, body interface{}) ([]byte, error)
+	SendRawRequest(httpMethod, function string, getBody func() (io.Reader, error), setReq func(req *http.Request) error) ([]byte, error)
 
 	// RegisterMethod registers a new bot command with its name, description and implementation to the telegram server
 	RegisterMethod(name, description string, function func(update entity.Update)) error
@@ -63,21 +62,32 @@ func NewBot(apiKey string) Bot {
 }
 
 // SendRawRequest sends a request to the telegram server and returns the result part of the response as a serialized json body
-func (b *bot) SendRawRequest(httpMethod, function string, body interface{}) ([]byte, error) {
-	client := http.Client{}
-	js, err := json.Marshal(body)
+func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Reader, error), setReq func(req *http.Request) error) ([]byte, error) {
+	var body io.Reader
+	if getBody != nil {
+		var err error
+		body, err = getBody()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(httpMethod, fmt.Sprintf(apiString, b.apiKey, function), body)
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(httpMethod, fmt.Sprintf(apiString, b.apiKey, function), bytes.NewBuffer(js))
-	req.Header.Set("Content-Type", "application/json")
+	if setReq != nil {
+		err = setReq(req)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
+
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
@@ -90,6 +100,7 @@ func (b *bot) SendRawRequest(httpMethod, function string, body interface{}) ([]b
 	if !resData.OK {
 		return nil, fmt.Errorf("error response: code = %d, description = %s, parameters: %+v", resData.ErrorCode, resData.Description, resData.Parameters)
 	}
+
 	resultBody, err := json.Marshal(resData.Result)
 	return resultBody, err
 }
@@ -128,7 +139,9 @@ func (b *bot) executeMethod(name string, update entity.Update) {
 // Listen creates a http server to listen for updates as a webhook handler.
 // It returns on failure only
 func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfig) error {
-	_, err := b.SendRawRequest("POST", "setWebhook", webhook)
+	_, err := b.SendRawRequest("POST", "setWebhook", func() (io.Reader, error) {
+		return GetJSONBody(webhook)
+	}, SetApplicationJSON)
 	if err != nil {
 		return err
 	}
@@ -165,11 +178,17 @@ func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfi
 //
 // It returns on failure only
 func (b *bot) Poll(duration time.Duration, config entity.UpdateConfig) error {
+	log.Println("deleting webhook if exists")
+	_, err := b.SendRawRequest(http.MethodPost, "deleteWebhook", nil, nil)
+	if err != nil {
+		return err
+	}
+
 	log.Printf("Polling with duration %v", duration)
 	var lastUpdate entity.Update
 	for {
 		time.Sleep(duration)
-		updatesJSON, err := b.SendRawRequest("GET", fmt.Sprintf("getUpdates?offset=%d", lastUpdate.UpdateID+1), nil)
+		updatesJSON, err := b.SendRawRequest(http.MethodGet, fmt.Sprintf("getUpdates?offset=%d", lastUpdate.UpdateID+1), nil, nil)
 		if err != nil {
 			log.Printf("Error while polling: %+v", err)
 			continue
