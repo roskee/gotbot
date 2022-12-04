@@ -122,4 +122,7 @@ type MessageEnvelop struct {
 
 	// All Parameters for sendContact Method
 	*Contact
+
+	// All Parameters for sendpPoll Method
+	*Poll
 }
