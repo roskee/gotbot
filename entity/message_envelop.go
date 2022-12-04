@@ -116,4 +116,7 @@ type MessageEnvelop struct {
 	Length int64 `json:"length,omitempty"`
 	// Media is an array of media messages to be sent, must include 2-10 items.
 	Media []InputMedia `json:"media,omitempty"`
+
+	// All Parameters for sendLocation Method
+	*Location
 }
