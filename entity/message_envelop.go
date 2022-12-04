@@ -119,4 +119,7 @@ type MessageEnvelop struct {
 
 	// All Parameters for sendLocation Method
 	*Location
+
+	// All Parameters for sendContact Method
+	*Contact
 }
