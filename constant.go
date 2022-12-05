@@ -80,3 +80,38 @@ type FormField struct {
 	Name  string
 	Value string
 }
+
+type MessageType string
+
+const (
+	// MessageText is for text message.
+	MessageText MessageType = "sendMessage"
+	// MessagePhoto is for single photo message.
+	MessagePhoto = "sendPhoto"
+	// MessageAudio is for single audio message.
+	MessageAudio = "sendAudio"
+	// MessageDocument is for single document message.
+	MessageDocument = "sendDocument"
+	// MessageVideo is for single video message.
+	MessageVideo = "sendVideo"
+	// MessageAnimation is for single animation message.
+	MessageAnimation = "sendAnimation"
+	// MessageVoice is for single voice message.
+	MessageVoice = "sendVoice"
+	// MessageVideoNote is for rounded, 1 minute MPEG4 videos.
+	MessageVideoNote = "sendVideoNote"
+	// MessageMediaGroup is for a group of media messages including photos, audios, videos, documents.
+	MessageMediaGroup = "sendMediaGroup"
+	// MessageLocation is for  location message.
+	MessageLocation = "sendLocation"
+	// MessageVenue is for venue message.
+	MessageVenue = "sendVenue"
+	// MessageContact is for phone contact message.
+	MessageContact = "sendContact"
+	// MessagePoll is for poll message.
+	MessagePoll = "sendPoll"
+	// MessageDice is for dice message.
+	MessageDice = "sendDice"
+	// MessageChatAction is for chat action message.
+	MessageChatAction = "sendChatAction"
+)
