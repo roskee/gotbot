@@ -3,12 +3,13 @@ package gotbot
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/roskee/gotbot/entity"
-	"github.com/roskee/gotbot/router"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/roskee/gotbot/entity"
+	"github.com/roskee/gotbot/router"
 )
 
 var apiString = "https://api.telegram.org/bot%s/%s"
@@ -17,7 +18,7 @@ var apiString = "https://api.telegram.org/bot%s/%s"
 type Bot interface {
 
 	// SendRawRequest sends a request to the telegram server and returns the result part of the response as a serialized json body
-	SendRawRequest(httpMethod, function string, getBody func() (io.Reader, error), setReq func(req *http.Request) error) ([]byte, error)
+	SendRawRequest(httpMethod, function string, getBody func() (io.Reader, BodyOptions, error), setReq func(req *http.Request) error) ([]byte, error)
 
 	// RegisterMethod registers a new bot command with its name, description and implementation to the telegram server
 	RegisterMethod(name, description string, function func(update entity.Update)) error
@@ -62,11 +63,13 @@ func NewBot(apiKey string) Bot {
 }
 
 // SendRawRequest sends a request to the telegram server and returns the result part of the response as a serialized json body
-func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Reader, error), setReq func(req *http.Request) error) ([]byte, error) {
+func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Reader, BodyOptions, error), setReq func(req *http.Request) error) ([]byte, error) {
 	var body io.Reader
+	var options BodyOptions
+
 	if getBody != nil {
 		var err error
-		body, err = getBody()
+		body, options, err = getBody()
 		if err != nil {
 			return nil, err
 		}
@@ -76,6 +79,9 @@ func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Rea
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Set("Content-Type", options.ContentType)
+
 	if setReq != nil {
 		err = setReq(req)
 		if err != nil {
@@ -139,7 +145,7 @@ func (b *bot) executeMethod(name string, update entity.Update) {
 // Listen creates a http server to listen for updates as a webhook handler.
 // It returns on failure only
 func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfig) error {
-	_, err := b.SendRawRequest("POST", "setWebhook", func() (io.Reader, error) {
+	_, err := b.SendRawRequest("POST", "setWebhook", func() (io.Reader, BodyOptions, error) {
 		return GetJSONBody(webhook)
 	}, SetApplicationJSON)
 	if err != nil {

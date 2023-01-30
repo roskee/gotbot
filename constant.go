@@ -8,6 +8,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strings"
+
+	"github.com/roskee/gotbot/entity"
 )
 
 // request setups
@@ -27,17 +31,35 @@ var (
 // body setters
 var (
 	// GetJSONBody marshals a given object to a json serialized string
-	GetJSONBody = func(value any) (io.Reader, error) {
+	GetJSONBody = func(value any) (io.Reader, BodyOptions, error) {
 		body, err := json.Marshal(value)
-		return bytes.NewBuffer(body), err
+		return bytes.NewBuffer(body), BodyOptions{ContentType: "application/json"}, err
 	}
-	// GetMultipartBody creates a form data with the given fields and files
-	GetMultipartBody = func(fields []FormField, files []FormFile) (io.Reader, error) {
+	// GetMultipartBody creates a form data with the given fields and files.
+	// if `files` contains an element with the same name in `msg`, only the file is added to the body.
+	GetMultipartBody = func(msg any, files ...entity.FileEnvelop) (io.Reader, BodyOptions, error) {
+		msgValue := reflect.ValueOf(msg)
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
-		for i := 0; i < len(fields); i++ {
-			if err := writer.WriteField(fields[i].Name, fields[i].Value); err != nil {
-				return nil, err
+		for i := 0; i < msgValue.NumField(); i++ {
+			fieldName := coalesce(strings.Split(reflect.TypeOf(msg).Field(i).Tag.Get("json"), ",")[0], reflect.TypeOf(msg).Field(i).Name)
+			var skip bool
+
+			for j := 0; j < len(files); j++ {
+				if files[j].Name == fieldName {
+					skip = true
+					break
+				}
+			}
+
+			if skip {
+				continue
+			}
+
+			if err := writer.WriteField(
+				fieldName,
+				msgValue.Field(i).String()); err != nil {
+				return nil, BodyOptions{}, err
 			}
 		}
 
@@ -61,24 +83,16 @@ var (
 				}
 				return writer.Close()
 			}(); err != nil {
-				return nil, err
+				return nil, BodyOptions{}, err
 			}
 		}
 
-		return body, nil
+		return body, BodyOptions{ContentType: writer.FormDataContentType()}, nil
 	}
 )
 
-// FormFile describes a file to be added to a form data
-type FormFile struct {
-	Name string
-	Path string
-}
-
-// FormField describes a non-file field value to be added to a form data
-type FormField struct {
-	Name  string
-	Value string
+type BodyOptions struct {
+	ContentType string
 }
 
 type MessageType string
@@ -115,3 +129,15 @@ const (
 	// MessageChatAction is for chat action message.
 	MessageChatAction = "sendChatAction"
 )
+
+func coalesce[T any](value ...T) T {
+	if len(value) == 0 {
+		return *new(T)
+	}
+
+	if len(value) == 1 || !reflect.ValueOf(value[0]).IsZero() {
+		return value[0]
+	}
+
+	return coalesce(value[1:]...)
+}
