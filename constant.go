@@ -3,6 +3,7 @@ package gotbot
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -52,13 +53,27 @@ var (
 				}
 			}
 
+			if strings.Contains(reflect.TypeOf(msg).Field(i).Tag.Get("json"), ",omitempty") &&
+				msgValue.Field(i).IsZero() {
+				skip = true
+			}
+
 			if skip {
 				continue
 			}
 
+			var value string
+
+			switch msgValue.Field(i).Kind() {
+			case reflect.Array:
+			case reflect.Struct, reflect.Map:
+			default:
+				value = fmt.Sprintf("%v", msgValue.Field(i).Interface())
+			}
+
 			if err := writer.WriteField(
 				fieldName,
-				msgValue.Field(i).String()); err != nil {
+				value); err != nil {
 				return nil, BodyOptions{}, err
 			}
 		}
@@ -78,16 +93,14 @@ var (
 					return err
 				}
 				_, err = io.Copy(fileField, file)
-				if err != nil {
-					return err
-				}
-				return writer.Close()
+
+				return err
 			}(); err != nil {
 				return nil, BodyOptions{}, err
 			}
 		}
 
-		return body, BodyOptions{ContentType: writer.FormDataContentType()}, nil
+		return body, BodyOptions{ContentType: writer.FormDataContentType()}, writer.Close()
 	}
 )
 

@@ -25,7 +25,7 @@ type Bot interface {
 
 	// SendMessage is the implementation of the builtin sendMessage function of the bot.
 	// It sends the given message to the sender user
-	SendMessage(message entity.MessageEnvelop) (entity.Message, error)
+	SendMessage(msgType MessageType, message entity.MessageEnvelop, files ...entity.FileEnvelop) (entity.Message, error)
 
 	// GetMyCommands is the implementation of the builtin getMyCommands function of the bot.
 	// It returns the list of all currently registered commands

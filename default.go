@@ -54,6 +54,9 @@ func (b *bot) sendMessage(messageType MessageType, message entity.MessageEnvelop
 	res, err = b.SendRawRequest(http.MethodPost, string(messageType), func() (io.Reader, BodyOptions, error) {
 		return GetMultipartBody(message, files...)
 	}, nil)
+	if err != nil {
+		return entity.Message{}, err
+	}
 
 	var msg entity.Message
 	err = json.Unmarshal(res, &msg)
@@ -62,8 +65,8 @@ func (b *bot) sendMessage(messageType MessageType, message entity.MessageEnvelop
 
 // SendMessage is the implementation of the builtin sendMessage function of the bot.
 // It sends the given message to the sender user
-func (b *bot) SendMessage(message entity.MessageEnvelop) (entity.Message, error) {
-	msg, err := b.sendMessage(MessageText, message)
+func (b *bot) SendMessage(msgtype MessageType, message entity.MessageEnvelop, files ...entity.FileEnvelop) (entity.Message, error) {
+	msg, err := b.sendMessage(msgtype, message, files...)
 	if err != nil {
 		return entity.Message{}, err
 	}
