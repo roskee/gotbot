@@ -42,8 +42,11 @@ var (
 		msgValue := reflect.ValueOf(msg)
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
+
 		for i := 0; i < msgValue.NumField(); i++ {
-			fieldName := coalesce(strings.Split(reflect.TypeOf(msg).Field(i).Tag.Get("json"), ",")[0], reflect.TypeOf(msg).Field(i).Name)
+			fieldName := coalesce(
+				strings.Split(reflect.TypeOf(msg).Field(i).Tag.Get("json"), ",")[0],
+				reflect.TypeOf(msg).Field(i).Name)
 			var skip bool
 
 			for j := 0; j < len(files); j++ {
@@ -53,7 +56,9 @@ var (
 				}
 			}
 
-			if strings.Contains(reflect.TypeOf(msg).Field(i).Tag.Get("json"), ",omitempty") &&
+			if strings.Contains(
+				reflect.TypeOf(msg).Field(i).Tag.Get("json"),
+				",omitempty") &&
 				msgValue.Field(i).IsZero() {
 				skip = true
 			}
@@ -65,8 +70,13 @@ var (
 			var value string
 
 			switch msgValue.Field(i).Kind() {
-			case reflect.Array:
-			case reflect.Struct, reflect.Map:
+			case reflect.Struct, reflect.Map, reflect.Array, reflect.Slice:
+				js, err := json.Marshal(msgValue.Field(i).Interface())
+				if err != nil {
+					return nil, BodyOptions{}, err
+				}
+
+				value = string(js)
 			default:
 				value = fmt.Sprintf("%v", msgValue.Field(i).Interface())
 			}

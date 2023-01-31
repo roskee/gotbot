@@ -33,9 +33,9 @@ func (b *bot) GetMyCommands() ([]entity.Command, error) {
 	return commands, nil
 }
 
-// setMyCommands is the implementation of the builtin setMyCommands function of the bot.
+// SetMyCommands is the implementation of the builtin setMyCommands function of the bot.
 // It sets the given commands as the bot's command
-func (b *bot) setMyCommands(commands []entity.Command) error {
+func (b *bot) SetMyCommands(commands []entity.Command) error {
 	_, err := b.SendRawRequest(http.MethodPost, "setMyCommands", func() (io.Reader, BodyOptions, error) {
 		return GetJSONBody(entity.Commands{
 			Commands: commands,
@@ -47,31 +47,10 @@ func (b *bot) setMyCommands(commands []entity.Command) error {
 	return nil
 }
 
-func (b *bot) sendMessage(messageType MessageType, message entity.MessageEnvelop, files ...entity.FileEnvelop) (entity.Message, error) {
-	var res []byte
-	var err error
-
-	res, err = b.SendRawRequest(http.MethodPost, string(messageType), func() (io.Reader, BodyOptions, error) {
-		return GetMultipartBody(message, files...)
-	}, nil)
-	if err != nil {
-		return entity.Message{}, err
-	}
-
-	var msg entity.Message
-	err = json.Unmarshal(res, &msg)
-	return msg, err
-}
-
 // SendMessage is the implementation of the builtin sendMessage function of the bot.
 // It sends the given message to the sender user
-func (b *bot) SendMessage(msgtype MessageType, message entity.MessageEnvelop, files ...entity.FileEnvelop) (entity.Message, error) {
-	msg, err := b.sendMessage(msgtype, message, files...)
-	if err != nil {
-		return entity.Message{}, err
-	}
-
-	return msg, err
+func (b *bot) SendMessage(message entity.MessageEnvelop) (entity.Message, error) {
+	return b.SendMessageAny(MessageText, message)
 }
 
 func (b *bot) AnswerCallbackQuery(options entity.AnswerCallbackQueryEntity) error {
