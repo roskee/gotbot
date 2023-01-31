@@ -3,12 +3,13 @@ package gotbot
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/roskee/gotbot/entity"
-	"github.com/roskee/gotbot/router"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/roskee/gotbot/entity"
+	"github.com/roskee/gotbot/router"
 )
 
 var apiString = "https://api.telegram.org/bot%s/%s"
@@ -17,18 +18,25 @@ var apiString = "https://api.telegram.org/bot%s/%s"
 type Bot interface {
 
 	// SendRawRequest sends a request to the telegram server and returns the result part of the response as a serialized json body
-	SendRawRequest(httpMethod, function string, getBody func() (io.Reader, error), setReq func(req *http.Request) error) ([]byte, error)
+	SendRawRequest(httpMethod, function string, getBody func() (io.Reader, BodyOptions, error), setReq func(req *http.Request) error) ([]byte, error)
 
 	// RegisterMethod registers a new bot command with its name, description and implementation to the telegram server
 	RegisterMethod(name, description string, function func(update entity.Update)) error
 
 	// SendMessage is the implementation of the builtin sendMessage function of the bot.
 	// It sends the given message to the sender user
-	SendMessage(message entity.MessageEnvelop) (entity.Message, error)
+	SendMessage(msg entity.MessageEnvelop) (entity.Message, error)
+
+	// SendMessageAny can be used to send any kind of message manually.
+	// All other Send* messages use this method internally.
+	SendMessageAny(msgType MessageType, message entity.MessageEnvelop, files ...entity.FileEnvelop) (entity.Message, error)
 
 	// GetMyCommands is the implementation of the builtin getMyCommands function of the bot.
 	// It returns the list of all currently registered commands
 	GetMyCommands() ([]entity.Command, error)
+
+	// SetMyCommands is the implementation of the builtin setMyCommands function of the bot.
+	SetMyCommands(commands []entity.Command) error
 
 	// GetMe is the implementation of the builtin getMe function of the bot
 	GetMe() (entity.User, error)
@@ -62,11 +70,13 @@ func NewBot(apiKey string) Bot {
 }
 
 // SendRawRequest sends a request to the telegram server and returns the result part of the response as a serialized json body
-func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Reader, error), setReq func(req *http.Request) error) ([]byte, error) {
+func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Reader, BodyOptions, error), setReq func(req *http.Request) error) ([]byte, error) {
 	var body io.Reader
+	var options BodyOptions
+
 	if getBody != nil {
 		var err error
-		body, err = getBody()
+		body, options, err = getBody()
 		if err != nil {
 			return nil, err
 		}
@@ -76,6 +86,9 @@ func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Rea
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Set("Content-Type", options.ContentType)
+
 	if setReq != nil {
 		err = setReq(req)
 		if err != nil {
@@ -105,6 +118,24 @@ func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Rea
 	return resultBody, err
 }
 
+// SendMessageAny can be used to send any kind of message manually.
+// All the default send functions use this internally.
+func (b *bot) SendMessageAny(messageType MessageType, message entity.MessageEnvelop, files ...entity.FileEnvelop) (entity.Message, error) {
+	var res []byte
+	var err error
+
+	res, err = b.SendRawRequest(http.MethodPost, string(messageType), func() (io.Reader, BodyOptions, error) {
+		return GetMultipartBody(message, files...)
+	}, nil)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var msg entity.Message
+
+	return msg, json.Unmarshal(res, &msg)
+}
+
 // RegisterMethod registers a new bot command with its name, description and implementation to the telegram server
 func (b *bot) RegisterMethod(name, description string, function func(update entity.Update)) error {
 	commands, err := b.GetMyCommands()
@@ -115,7 +146,7 @@ func (b *bot) RegisterMethod(name, description string, function func(update enti
 		Command:     name,
 		Description: description,
 	})
-	err = b.setMyCommands(commands)
+	err = b.SetMyCommands(commands)
 	if err != nil {
 		return err
 	}
@@ -139,7 +170,7 @@ func (b *bot) executeMethod(name string, update entity.Update) {
 // Listen creates a http server to listen for updates as a webhook handler.
 // It returns on failure only
 func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfig) error {
-	_, err := b.SendRawRequest("POST", "setWebhook", func() (io.Reader, error) {
+	_, err := b.SendRawRequest("POST", "setWebhook", func() (io.Reader, BodyOptions, error) {
 		return GetJSONBody(webhook)
 	}, SetApplicationJSON)
 	if err != nil {

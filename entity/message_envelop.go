@@ -39,3 +39,11 @@ type MessageEnvelop struct {
 		*ForceReply
 	} `json:"reply_markup,omitempty"`
 }
+
+// FileEnvelop represents a file to be uploaded to the telegram server.
+type FileEnvelop struct {
+	// Name is the field name for this file for the upload request.
+	Name string
+	// Path is the location of this file on this device.
+	Path string
+}
