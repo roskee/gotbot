@@ -2,9 +2,10 @@ package gotbot
 
 import (
 	"encoding/json"
-	"github.com/roskee/gotbot/entity"
 	"io"
 	"net/http"
+
+	"github.com/roskee/gotbot/entity"
 )
 
 // GetMe is the implementation of the builtin getMe function of the bot
@@ -32,10 +33,10 @@ func (b *bot) GetMyCommands() ([]entity.Command, error) {
 	return commands, nil
 }
 
-// setMyCommands is the implementation of the builtin setMyCommands function of the bot.
+// SetMyCommands is the implementation of the builtin setMyCommands function of the bot.
 // It sets the given commands as the bot's command
-func (b *bot) setMyCommands(commands []entity.Command) error {
-	_, err := b.SendRawRequest(http.MethodPost, "setMyCommands", func() (io.Reader, error) {
+func (b *bot) SetMyCommands(commands []entity.Command) error {
+	_, err := b.SendRawRequest(http.MethodPost, "setMyCommands", func() (io.Reader, BodyOptions, error) {
 		return GetJSONBody(entity.Commands{
 			Commands: commands,
 		})
@@ -49,19 +50,11 @@ func (b *bot) setMyCommands(commands []entity.Command) error {
 // SendMessage is the implementation of the builtin sendMessage function of the bot.
 // It sends the given message to the sender user
 func (b *bot) SendMessage(message entity.MessageEnvelop) (entity.Message, error) {
-	body, err := b.SendRawRequest(http.MethodPost, "sendMessage", func() (io.Reader, error) {
-		return GetJSONBody(message)
-	}, SetApplicationJSON)
-	if err != nil {
-		return entity.Message{}, err
-	}
-	var msg entity.Message
-	err = json.Unmarshal(body, &msg)
-	return msg, err
+	return b.SendMessageAny(MessageText, message)
 }
 
 func (b *bot) AnswerCallbackQuery(options entity.AnswerCallbackQueryEntity) error {
-	_, err := b.SendRawRequest(http.MethodPost, "answerCallbackQuery", func() (io.Reader, error) {
+	_, err := b.SendRawRequest(http.MethodPost, "answerCallbackQuery", func() (io.Reader, BodyOptions, error) {
 		return GetJSONBody(options)
 	}, SetApplicationJSON)
 	return err

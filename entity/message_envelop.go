@@ -137,3 +137,11 @@ type MessageEnvelop struct {
 	// It is a required field for sending a chat action.
 	Action string `json:"action"`
 }
+
+// FileEnvelop represents a file to be uploaded to the telegram server.
+type FileEnvelop struct {
+	// Name is the field name for this file for the upload request.
+	Name string
+	// Path is the location of this file on this device.
+	Path string
+}
