@@ -9,7 +9,7 @@ type ForwardMessageEnvelop struct {
 	// MessageThreadID is the unique identifier for the target message thread
 	// (topic) of the forum;
 	// for forum super groups only.
-	MessageThreadID float64 `json:"message_thread_id,omitempty"`
+	MessageThreadID int64 `json:"message_thread_id,omitempty"`
 	// FromChatID id of the chat where the original message was sent.
 	//
 	// It is a required field.
@@ -22,5 +22,5 @@ type ForwardMessageEnvelop struct {
 	// MessageID is the id of the message to forward.
 	//
 	// It is a required field.
-	MessageID float64 `json:"message_id,omitempty"`
+	MessageID int64 `json:"message_id,omitempty"`
 }
