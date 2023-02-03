@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/roskee/gotbot/entity"
+	"github.com/roskee/gotbot/envelop"
 	"github.com/roskee/gotbot/router"
 )
 
@@ -54,6 +55,9 @@ type Bot interface {
 
 	// AnswerCallbackQuery send answers to callback queries sent from entity.InlineKeyboardMarkup.
 	AnswerCallbackQuery(options entity.AnswerCallbackQueryEntity) error
+	// ForwardMessage is used to forward messages of any kind.
+	// Service messages can't be forwarded.
+	ForwardMessage(msgEnvelop envelop.ForwardMessageEnvelop) (entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface
