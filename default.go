@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/roskee/gotbot/entity"
+	"github.com/roskee/gotbot/envelop"
 )
 
 // GetMe is the implementation of the builtin getMe function of the bot
@@ -58,4 +59,17 @@ func (b *bot) AnswerCallbackQuery(options entity.AnswerCallbackQueryEntity) erro
 		return GetJSONBody(options)
 	}, SetApplicationJSON)
 	return err
+}
+
+func (b *bot) ForwardMessage(msgEnvelop envelop.ForwardMessageEnvelop) (entity.Message, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "forwardMessage", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msgEnvelop)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var msg entity.Message
+
+	return msg, json.Unmarshal(res, &msg)
 }
