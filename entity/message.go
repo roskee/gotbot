@@ -130,3 +130,10 @@ type MessageEntity struct {
 	// CustomEmojiID is, for “custom_emoji” only, unique identifier of the custom emoji.
 	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
 }
+
+type ReplyMarkup struct {
+	*InlineKeyboardMarkup
+	*ReplyKeyboardMarkup
+	*ReplyKeyboardRemove
+	*ForceReply
+}

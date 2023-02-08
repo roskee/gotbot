@@ -58,6 +58,11 @@ type Bot interface {
 	// ForwardMessage is used to forward messages of any kind.
 	// Service messages can't be forwarded.
 	ForwardMessage(msgEnvelop envelop.ForwardMessageEnvelop) (entity.Message, error)
+	// CopyMessage is used to copy messages of any kind.
+	// Service messages and invoice messages can't be copied.
+	// A quiz poll can be copied only if the value of
+	// the field 'correct_option_id' is known to the bot.
+	CopyMessage(msgEnvelop envelop.CopyMessageEnvelop) (int64, error)
 }
 
 // bot is in-package implementation of the Bot interface

@@ -73,3 +73,16 @@ func (b *bot) ForwardMessage(msgEnvelop envelop.ForwardMessageEnvelop) (entity.M
 
 	return msg, json.Unmarshal(res, &msg)
 }
+
+func (b *bot) CopyMessage(msgEnvelop envelop.CopyMessageEnvelop) (int64, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "copyMessage", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msgEnvelop)
+	}, SetApplicationJSON)
+	if err != nil {
+		return 0, err
+	}
+
+	var msgID entity.Message
+
+	return msgID.MessageID, json.Unmarshal(res, &msgID)
+}

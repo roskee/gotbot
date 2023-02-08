@@ -32,12 +32,7 @@ type MessageEnvelop struct {
 	// even if the specified replied-to message is not found.
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply,omitempty"`
 	// ReplyMarkup contains additional interface options.
-	ReplyMarkup struct {
-		*InlineKeyboardMarkup
-		*ReplyKeyboardMarkup
-		*ReplyKeyboardRemove
-		*ForceReply
-	} `json:"reply_markup,omitempty"`
+	ReplyMarkup ReplyMarkup `json:"reply_markup,omitempty"`
 	// Photo is the photo to send.
 	// Pass a file_id as String to send a photo that exists on the Telegram servers (recommended),
 	// pass an HTTP URL as a String for Telegram to get a photo from the Internet,
