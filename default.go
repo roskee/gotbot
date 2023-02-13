@@ -51,7 +51,11 @@ func (b *bot) SetMyCommands(commands []entity.Command) error {
 // SendMessage is the implementation of the builtin sendMessage function of the bot.
 // It sends the given message to the sender user
 func (b *bot) SendMessage(message entity.MessageEnvelop) (entity.Message, error) {
-	return b.SendMessageAny(MessageText, message)
+	var res entity.Message
+
+	err := b.SendMessageAny(MessageText, message, &res)
+
+	return res, err
 }
 
 func (b *bot) AnswerCallbackQuery(options entity.AnswerCallbackQueryEntity) error {
@@ -85,4 +89,12 @@ func (b *bot) CopyMessage(msgEnvelop envelop.CopyMessageEnvelop) (int64, error) 
 	var msgID entity.Message
 
 	return msgID.MessageID, json.Unmarshal(res, &msgID)
+}
+
+func (b *bot) SendPhoto(msg entity.MessageEnvelop) (entity.Message, error) {
+	var res entity.Message
+
+	err := b.SendMessageAny(MessagePhoto, msg, &res)
+
+	return res, err
 }
