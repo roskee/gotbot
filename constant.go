@@ -7,8 +7,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -38,7 +36,7 @@ var (
 	}
 	// GetMultipartBody creates a form data with the given fields and files.
 	// if `files` contains an element with the same name in `msg`, only the file is added to the body.
-	GetMultipartBody = func(msg any, files ...entity.FileEnvelop) (io.Reader, BodyOptions, error) {
+	GetMultipartBody = func(msg any) (io.Reader, BodyOptions, error) {
 		msgValue := reflect.ValueOf(msg)
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
@@ -48,13 +46,6 @@ var (
 				strings.Split(reflect.TypeOf(msg).Field(i).Tag.Get("json"), ",")[0],
 				reflect.TypeOf(msg).Field(i).Name)
 			var skip bool
-
-			for j := 0; j < len(files); j++ {
-				if files[j].Name == fieldName {
-					skip = true
-					break
-				}
-			}
 
 			if strings.Contains(
 				reflect.TypeOf(msg).Field(i).Tag.Get("json"),
@@ -68,45 +59,32 @@ var (
 			}
 
 			var value string
-
-			switch msgValue.Field(i).Kind() {
-			case reflect.Struct, reflect.Map, reflect.Array, reflect.Slice:
-				js, err := json.Marshal(msgValue.Field(i).Interface())
-				if err != nil {
+			if msgValue.Field(i).Type() == reflect.TypeOf(&entity.FileEnvelop{}) {
+				if err := msgValue.Field(i).
+					Interface().(*entity.FileEnvelop).
+					SetValue(writer, fieldName); err != nil {
 					return nil, BodyOptions{}, err
 				}
+			} else {
+				switch msgValue.Field(i).Kind() {
+				case reflect.Struct, reflect.Map,
+					reflect.Array, reflect.Slice,
+					reflect.Interface:
+					js, err := json.Marshal(msgValue.Field(i).Interface())
+					if err != nil {
+						return nil, BodyOptions{}, err
+					}
 
-				value = string(js)
-			default:
-				value = fmt.Sprintf("%v", msgValue.Field(i).Interface())
-			}
-
-			if err := writer.WriteField(
-				fieldName,
-				value); err != nil {
-				return nil, BodyOptions{}, err
-			}
-		}
-
-		for i := 0; i < len(files); i++ {
-			if err := func() error {
-				file, err := os.Open(files[i].Path)
-				if err != nil {
-					return err
+					value = string(js)
+				default:
+					value = fmt.Sprintf("%v", msgValue.Field(i).Interface())
 				}
-				defer func(file *os.File) {
-					_ = file.Close()
-				}(file)
 
-				fileField, err := writer.CreateFormFile(files[i].Name, filepath.Base(files[i].Path))
-				if err != nil {
-					return err
+				if err := writer.WriteField(
+					fieldName,
+					value); err != nil {
+					return nil, BodyOptions{}, err
 				}
-				_, err = io.Copy(fileField, file)
-
-				return err
-			}(); err != nil {
-				return nil, BodyOptions{}, err
 			}
 		}
 

@@ -1,5 +1,13 @@
 package entity
 
+import (
+	"io"
+	"mime/multipart"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
 // MessageEnvelop holds the object that is used to send a new message
 type MessageEnvelop struct {
 	// ChatID is the unique identifier for the target chat
@@ -39,7 +47,7 @@ type MessageEnvelop struct {
 	// or upload a new photo using multipart/form-data.
 	//
 	// It is a required field for sending a photo.
-	Photo any `json:"photo,omitempty"`
+	Photo *FileEnvelop `json:"photo,omitempty"`
 	// Caption is the media caption
 	Caption string `json:"caption,omitempty"`
 	// CaptionEntities is list of special entities that appear in the caption,
@@ -134,9 +142,40 @@ type MessageEnvelop struct {
 }
 
 // FileEnvelop represents a file to be uploaded to the telegram server.
+// either `Value` or `Path` can be set at a time.
+// If both are set, an error is returned
 type FileEnvelop struct {
-	// Name is the field name for this file for the upload request.
-	Name string
-	// Path is the location of this file on this device.
+	// Path is the photo described as,
+	//
+	// a file_id on the telegram server or
+	//
+	// an http url for a photo from the internet or
+	//
+	// a photo on this device (must be prefixed with `file://`)
 	Path string
+}
+
+func (f *FileEnvelop) SetValue(writer *multipart.Writer, name string) error {
+	if strings.HasPrefix(f.Path, "file://") {
+		path := strings.TrimPrefix(f.Path, "file://")
+
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer func(file *os.File) {
+			_ = file.Close()
+		}(file)
+
+		fileField, err := writer.CreateFormFile(name, filepath.Base(path))
+		if err != nil {
+			return err
+		}
+
+		_, err = io.Copy(fileField, file)
+
+		return err
+	}
+
+	return writer.WriteField(name, f.Path)
 }

@@ -30,7 +30,7 @@ type Bot interface {
 
 	// SendMessageAny can be used to send any kind of message manually.
 	// All other Send* messages use this method internally.
-	SendMessageAny(msgType MessageType, message entity.MessageEnvelop, files ...entity.FileEnvelop) (entity.Message, error)
+	SendMessageAny(msgType MessageType, message entity.MessageEnvelop) (entity.Message, error)
 
 	// GetMyCommands is the implementation of the builtin getMyCommands function of the bot.
 	// It returns the list of all currently registered commands
@@ -129,12 +129,12 @@ func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Rea
 
 // SendMessageAny can be used to send any kind of message manually.
 // All the default send functions use this internally.
-func (b *bot) SendMessageAny(messageType MessageType, message entity.MessageEnvelop, files ...entity.FileEnvelop) (entity.Message, error) {
+func (b *bot) SendMessageAny(messageType MessageType, message entity.MessageEnvelop) (entity.Message, error) {
 	var res []byte
 	var err error
 
 	res, err = b.SendRawRequest(http.MethodPost, string(messageType), func() (io.Reader, BodyOptions, error) {
-		return GetMultipartBody(message, files...)
+		return GetMultipartBody(message)
 	}, nil)
 	if err != nil {
 		return entity.Message{}, err
