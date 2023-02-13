@@ -63,6 +63,8 @@ type Bot interface {
 	// A quiz poll can be copied only if the value of
 	// the field 'correct_option_id' is known to the bot.
 	CopyMessage(msgEnvelop envelop.CopyMessageEnvelop) (int64, error)
+	// SendPhoto is used to send photos.
+	SendPhoto(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface

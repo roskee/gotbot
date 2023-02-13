@@ -86,3 +86,7 @@ func (b *bot) CopyMessage(msgEnvelop envelop.CopyMessageEnvelop) (int64, error) 
 
 	return msgID.MessageID, json.Unmarshal(res, &msgID)
 }
+
+func (b *bot) SendPhoto(msg entity.MessageEnvelop) (entity.Message, error) {
+	return b.SendMessageAny(MessagePhoto, msg)
+}
