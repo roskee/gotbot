@@ -36,7 +36,7 @@ var (
 	}
 	// GetMultipartBody creates a form data with the given fields and files.
 	// if `files` contains an element with the same name in `msg`, only the file is added to the body.
-	GetMultipartBody = func(msg any) (io.Reader, BodyOptions, error) {
+	GetMultipartBody = func(msg any, attachedFiles ...entity.FileEnvelop) (io.Reader, BodyOptions, error) {
 		msgValue := reflect.ValueOf(msg)
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
@@ -85,6 +85,12 @@ var (
 					value); err != nil {
 					return nil, BodyOptions{}, err
 				}
+			}
+		}
+
+		for _, v := range attachedFiles {
+			if err := v.SetValue(writer, ""); err != nil {
+				return nil, BodyOptions{}, err
 			}
 		}
 
