@@ -65,6 +65,12 @@ type Bot interface {
 	CopyMessage(msgEnvelop envelop.CopyMessageEnvelop) (int64, error)
 	// SendPhoto is used to send photos.
 	SendPhoto(msg entity.MessageEnvelop) (entity.Message, error)
+	// SendAudio is used to send audio files.
+	// For telegrm to show the audio in the music player,
+	// it must be in the format .mp3 or .m4a.
+	//
+	// Note: bots can only send audio files up to 50 MB in size.
+	SendAudio(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface
