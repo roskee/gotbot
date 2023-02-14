@@ -71,6 +71,12 @@ type Bot interface {
 	//
 	// Note: bots can only send audio files up to 50 MB in size.
 	SendAudio(msg entity.MessageEnvelop) (entity.Message, error)
+	// SendVideo is used to send video files.
+	// Only MPEG4 videos are supported.
+	// (other formats can be sent as a document)
+	//
+	// Note: bots can only send audio files up to 50 MB in size.
+	SendVideo(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface
