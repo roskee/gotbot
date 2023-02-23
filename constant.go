@@ -37,55 +37,11 @@ var (
 	// GetMultipartBody creates a form data with the given fields and files.
 	// if `files` contains an element with the same name in `msg`, only the file is added to the body.
 	GetMultipartBody = func(msg any, attachedFiles ...entity.FileEnvelop) (io.Reader, BodyOptions, error) {
-		msgValue := reflect.ValueOf(msg)
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
 
-		for i := 0; i < msgValue.NumField(); i++ {
-			fieldName := coalesce(
-				strings.Split(reflect.TypeOf(msg).Field(i).Tag.Get("json"), ",")[0],
-				reflect.TypeOf(msg).Field(i).Name)
-			var skip bool
-
-			if strings.Contains(
-				reflect.TypeOf(msg).Field(i).Tag.Get("json"),
-				",omitempty") &&
-				msgValue.Field(i).IsZero() {
-				skip = true
-			}
-
-			if skip {
-				continue
-			}
-
-			var value string
-			if msgValue.Field(i).Type() == reflect.TypeOf(&entity.FileEnvelop{}) {
-				if err := msgValue.Field(i).
-					Interface().(*entity.FileEnvelop).
-					SetValue(writer, fieldName); err != nil {
-					return nil, BodyOptions{}, err
-				}
-			} else {
-				switch msgValue.Field(i).Kind() {
-				case reflect.Struct, reflect.Map,
-					reflect.Array, reflect.Slice,
-					reflect.Interface:
-					js, err := json.Marshal(msgValue.Field(i).Interface())
-					if err != nil {
-						return nil, BodyOptions{}, err
-					}
-
-					value = string(js)
-				default:
-					value = fmt.Sprintf("%v", msgValue.Field(i).Interface())
-				}
-
-				if err := writer.WriteField(
-					fieldName,
-					value); err != nil {
-					return nil, BodyOptions{}, err
-				}
-			}
+		if err := x(msg, body, writer); err != nil {
+			return nil, BodyOptions{}, err
 		}
 
 		for _, v := range attachedFiles {
@@ -97,6 +53,65 @@ var (
 		return body, BodyOptions{ContentType: writer.FormDataContentType()}, writer.Close()
 	}
 )
+
+func x(msg any, body *bytes.Buffer, writer *multipart.Writer) error {
+	msgValue := reflect.ValueOf(msg)
+
+	for i := 0; i < msgValue.NumField(); i++ {
+		msgValue := reflect.ValueOf(msg)
+		fieldName := coalesce(
+			strings.Split(reflect.TypeOf(msg).Field(i).Tag.Get("json"), ",")[0],
+			reflect.TypeOf(msg).Field(i).Name)
+		var skip bool
+
+		if strings.Contains(
+			reflect.TypeOf(msg).Field(i).Tag.Get("json"),
+			",omitempty") &&
+			msgValue.Field(i).IsZero() {
+			skip = true
+		}
+
+		if skip {
+			continue
+		}
+
+		var value string
+		if msgValue.Field(i).Type() == reflect.TypeOf(&entity.FileEnvelop{}) {
+			if err := msgValue.Field(i).
+				Interface().(*entity.FileEnvelop).
+				SetValue(writer, fieldName); err != nil {
+				return err
+			}
+		} else {
+			switch msgValue.Field(i).Kind() {
+			case reflect.Struct, reflect.Map,
+				reflect.Array, reflect.Slice,
+				reflect.Interface:
+				if reflect.TypeOf(msg).Field(i).Anonymous {
+					if err := x(msgValue.Field(i).Interface(), body, writer); err != nil {
+						return err
+					}
+				}
+				js, err := json.Marshal(msgValue.Field(i).Interface())
+				if err != nil {
+					return err
+				}
+
+				value = string(js)
+			default:
+				value = fmt.Sprintf("%v", msgValue.Field(i).Interface())
+			}
+
+			if err := writer.WriteField(
+				fieldName,
+				value); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
 
 type BodyOptions struct {
 	ContentType string
