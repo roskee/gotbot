@@ -40,7 +40,7 @@ var (
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
 
-		if err := x(msg, body, writer); err != nil {
+		if err := writeFields(msg, body, writer); err != nil {
 			return nil, BodyOptions{}, err
 		}
 
@@ -54,7 +54,7 @@ var (
 	}
 )
 
-func x(msg any, body *bytes.Buffer, writer *multipart.Writer) error {
+func writeFields(msg any, body *bytes.Buffer, writer *multipart.Writer) error {
 	msgValue := reflect.ValueOf(msg)
 
 	for i := 0; i < msgValue.NumField(); i++ {
@@ -88,7 +88,7 @@ func x(msg any, body *bytes.Buffer, writer *multipart.Writer) error {
 				reflect.Array, reflect.Slice,
 				reflect.Interface:
 				if reflect.TypeOf(msg).Field(i).Anonymous {
-					if err := x(msgValue.Field(i).Interface(), body, writer); err != nil {
+					if err := writeFields(msgValue.Field(i).Interface(), body, writer); err != nil {
 						return err
 					}
 				}
