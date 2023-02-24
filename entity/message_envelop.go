@@ -121,16 +121,16 @@ type MessageEnvelop struct {
 	Media []InputMedia `json:"media,omitempty"`
 
 	// All Parameters for sendLocation Method
-	*Location
+	Location
 
 	// All Parameters for sendContact Method
-	*Contact
+	Contact
 
 	// All Parameters for sendPoll Method
-	*Poll
+	Poll
 
 	// All Parameters for sendDice Method
-	*Dice
+	Dice
 
 	// Action is type of action to broadcast. Choose one, depending on what the user is about to receive.
 	// typing for text messages, upload_photo for photos, record_video or upload_video for videos,
