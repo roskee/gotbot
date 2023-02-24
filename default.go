@@ -116,16 +116,8 @@ func (b *bot) SendVideo(msg entity.MessageEnvelop) (entity.Message, error) {
 }
 
 func (b *bot) SendLocation(msg entity.MessageEnvelop) (entity.Message, error) {
-	msgt, err := b.SendRawRequest(http.MethodPost, MessageLocation, func() (io.Reader, BodyOptions, error) {
-		return GetJSONBody(msg)
-	}, SetApplicationJSON)
-	if err != nil {
-		return entity.Message{}, err
-	}
-
 	var res entity.Message
-	if err := json.Unmarshal(msgt, &res); err != nil {
-		return entity.Message{}, err
-	}
-	return res, nil
+
+	err := b.SendMessageAny(MessageLocation, msg, &res)
+	return res, err
 }
