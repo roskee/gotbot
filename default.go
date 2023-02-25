@@ -114,3 +114,10 @@ func (b *bot) SendVideo(msg entity.MessageEnvelop) (entity.Message, error) {
 
 	return res, err
 }
+
+func (b *bot) SendLocation(msg entity.MessageEnvelop) (entity.Message, error) {
+	var res entity.Message
+
+	err := b.SendMessageAny(MessageLocation, msg, &res)
+	return res, err
+}

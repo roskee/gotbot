@@ -77,6 +77,9 @@ type Bot interface {
 	//
 	// Note: bots can only send audio files up to 50 MB in size.
 	SendVideo(msg entity.MessageEnvelop) (entity.Message, error)
+
+	// SendLocation is used to send location
+	SendLocation(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface
@@ -233,6 +236,7 @@ func (b *bot) Poll(duration time.Duration, config entity.UpdateConfig) error {
 	log.Println("deleting webhook if exists")
 	_, err := b.SendRawRequest(http.MethodPost, "deleteWebhook", nil, nil)
 	if err != nil {
+		log.Println("error", err)
 		return err
 	}
 
