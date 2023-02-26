@@ -267,7 +267,7 @@ func (b *bot) executeUpdate(update entity.Update, config entity.UpdateConfig) {
 	if update.Message != nil {
 		if command := update.Message.GetCommand(); command != "" {
 			b.executeMethod(command, update)
-			b.logger.Log(logInfo("%s command executed", command))
+			b.logger.Log(logDebug("%s command executed", command))
 		}
 		if config.OnMessage != nil {
 			config.OnMessage(*update.Message)
