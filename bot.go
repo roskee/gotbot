@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -86,12 +85,14 @@ type Bot interface {
 type bot struct {
 	apiKey  string
 	methods []router.Handler
+	logger  Logger
 }
 
 // NewBot returns a new bot with the token apiKey
 func NewBot(apiKey string) Bot {
 	return &bot{
 		apiKey: apiKey,
+		logger: &defaultLogger{},
 	}
 }
 
@@ -204,7 +205,7 @@ func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfi
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		// check token
 		if webhook.SecretToken != req.Header.Get("X-Telegram-Bot-Api-Secret-Token") {
-			log.Printf("invalid secret token: %v", req.Header.Get("X-Telegram-Bot-Api-Secret-Token"))
+			b.logger.Log(logWarn("invalid secret token: %v", req.Header.Get("X-Telegram-Bot-Api-Secret-Token")))
 			res.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -233,26 +234,26 @@ func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfi
 //
 // It returns on failure only
 func (b *bot) Poll(duration time.Duration, config entity.UpdateConfig) error {
-	log.Println("deleting webhook if exists")
+	b.logger.Log(logInfo("deleting webhook if exists"))
 	_, err := b.SendRawRequest(http.MethodPost, "deleteWebhook", nil, nil)
 	if err != nil {
-		log.Println("error", err)
+		b.logger.Log(logError("error while deleting webhook: %v", err))
 		return err
 	}
 
-	log.Printf("Polling with duration %v", duration)
+	b.logger.Log(logInfo("Polling with duration %v", duration))
 	var lastUpdate entity.Update
 	for {
 		time.Sleep(duration)
 		updatesJSON, err := b.SendRawRequest(http.MethodGet, fmt.Sprintf("getUpdates?offset=%d", lastUpdate.UpdateID+1), nil, nil)
 		if err != nil {
-			log.Printf("Error while polling: %+v", err)
+			b.logger.Log(logError("Error while polling: %+v", err))
 			continue
 		}
 		var updates []entity.Update
 		err = json.Unmarshal(updatesJSON, &updates)
 		if err != nil {
-			log.Printf("Error while polling: %+v", err)
+			b.logger.Log(logError("Error while polling: %+v", err))
 			continue
 		}
 		for _, update := range updates {
@@ -266,7 +267,7 @@ func (b *bot) executeUpdate(update entity.Update, config entity.UpdateConfig) {
 	if update.Message != nil {
 		if command := update.Message.GetCommand(); command != "" {
 			b.executeMethod(command, update)
-			log.Printf("%s command executed", command)
+			b.logger.Log(logInfo("%s command executed", command))
 		}
 		if config.OnMessage != nil {
 			config.OnMessage(*update.Message)
@@ -296,6 +297,11 @@ func (b *bot) executeUpdate(update entity.Update, config entity.UpdateConfig) {
 			config.OnCallbackQuery(*update.CallbackQuery)
 		}
 	} else { // TODO: missing update types
-		log.Printf("unknown update: %+v", update)
+		b.logger.Log(logWarn("unknown update: %+v", update))
 	}
+}
+
+// SetLogger sets the logger of the bot.
+func (b *bot) SetLogger(logger Logger) {
+	b.logger = logger
 }
