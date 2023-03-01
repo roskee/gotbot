@@ -59,11 +59,11 @@ func (d *JSONLogger) formatLog(level Level, msg string, fields map[string]any) {
 
 	js, err := json.Marshal(fields)
 	if err != nil {
-		fmt.Println(fmt.Sprintf(`{"level":"error","msg":"failed to parse the log message to json","error":"%s","time":"%s","log":"%s"}`,
+		fmt.Printf(`{"level":"error","msg":"failed to parse the log message to json","error":"%s","time":"%s","log":"%s"}\n`,
 			err.Error(),
 			time.Now().Format(d.TimeFormat),
 			fmt.Sprintf("msg: %s, fields: %v, level: %s",
-				msg, fields, level)))
+				msg, fields, level))
 	}
 
 	fmt.Println(string(js))
