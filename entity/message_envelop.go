@@ -142,8 +142,6 @@ type MessageEnvelop struct {
 }
 
 // FileEnvelop represents a file to be uploaded to the telegram server.
-// either `Value` or `Path` can be set at a time.
-// If both are set, an error is returned
 type FileEnvelop struct {
 	// Path is the photo described as,
 	//

@@ -129,3 +129,11 @@ func (b *bot) SendDocument(msg entity.MessageEnvelop) (entity.Message, error) {
 
 	return res, err
 }
+
+func (b *bot) SendVoice(msg entity.MessageEnvelop) (entity.Message, error) {
+	var res entity.Message
+
+	err := b.SendMessageAny(MessageVoice, msg, &res)
+
+	return res, err
+}

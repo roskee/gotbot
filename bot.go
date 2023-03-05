@@ -83,6 +83,10 @@ type Bot interface {
 	//
 	// Note: bots can only send files of any type up to 50 MB in size.
 	SendDocument(msg entity.MessageEnvelop) (entity.Message, error)
+	// SendVoice is used to send audio files.
+	//
+	// Note: bots can only send voice messages up to 50 MB in size.
+	SendVoice(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface
