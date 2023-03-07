@@ -87,6 +87,11 @@ type Bot interface {
 	//
 	// Note: bots can only send voice messages up to 50 MB in size.
 	SendVoice(msg entity.MessageEnvelop) (entity.Message, error)
+
+	// SendMediaGroup is used to send a group of photos, videos, documents or audios as an album.
+	//
+	// Note: Documents and audio files can be only grouped in an album with messages of the same type.
+	SendMediaGroup(msg entity.MessageEnvelop) ([]entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface
