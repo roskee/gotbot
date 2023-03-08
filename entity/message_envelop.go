@@ -143,13 +143,13 @@ type MessageEnvelop struct {
 
 // FileEnvelop represents a file to be uploaded to the telegram server.
 type FileEnvelop struct {
-	// Path is the photo described as,
+	// Path is a file described as,
 	//
 	// a file_id on the telegram server or
 	//
-	// an http url for a photo from the internet or
+	// an http url for the file from the internet or
 	//
-	// a photo on this device (must be prefixed with `file://`)
+	// a file on this device (must be prefixed with `file://`)
 	Path string
 	// Name is the name to append this file with on the request body.
 	// It is only used if the *FileEnvelop.SetValue is called with an empty name.

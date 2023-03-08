@@ -145,3 +145,11 @@ func (b *bot) SendMediaGroup(msg entity.MessageEnvelop) ([]entity.Message, error
 
 	return res, err
 }
+
+func (b *bot) SendVideoNote(msg entity.MessageEnvelop) (entity.Message, error) {
+	var res entity.Message
+
+	err := b.SendMessageAny(MessageVideoNote, msg, &res)
+
+	return res, err
+}
