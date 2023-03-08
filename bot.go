@@ -54,22 +54,27 @@ type Bot interface {
 
 	// AnswerCallbackQuery send answers to callback queries sent from entity.InlineKeyboardMarkup.
 	AnswerCallbackQuery(options entity.AnswerCallbackQueryEntity) error
+
 	// ForwardMessage is used to forward messages of any kind.
 	// Service messages can't be forwarded.
 	ForwardMessage(msgEnvelop envelop.ForwardMessageEnvelop) (entity.Message, error)
+
 	// CopyMessage is used to copy messages of any kind.
 	// Service messages and invoice messages can't be copied.
 	// A quiz poll can be copied only if the value of
 	// the field 'correct_option_id' is known to the bot.
 	CopyMessage(msgEnvelop envelop.CopyMessageEnvelop) (int64, error)
+
 	// SendPhoto is used to send photos.
 	SendPhoto(msg entity.MessageEnvelop) (entity.Message, error)
+
 	// SendAudio is used to send audio files.
 	// For telegrm to show the audio in the music player,
 	// it must be in the format .mp3 or .m4a.
 	//
 	// Note: bots can only send audio files up to 50 MB in size.
 	SendAudio(msg entity.MessageEnvelop) (entity.Message, error)
+
 	// SendVideo is used to send video files.
 	// Only MPEG4 videos are supported.
 	// (other formats can be sent as a document)
@@ -82,16 +87,21 @@ type Bot interface {
 	// SendDocument is used to send general files.
 	//
 	// Note: bots can only send files of any type up to 50 MB in size.
+
 	SendDocument(msg entity.MessageEnvelop) (entity.Message, error)
 	// SendVoice is used to send audio files.
 	//
 	// Note: bots can only send voice messages up to 50 MB in size.
+
 	SendVoice(msg entity.MessageEnvelop) (entity.Message, error)
 
 	// SendMediaGroup is used to send a group of photos, videos, documents or audios as an album.
 	//
 	// Note: Documents and audio files can be only grouped in an album with messages of the same type.
 	SendMediaGroup(msg entity.MessageEnvelop) ([]entity.Message, error)
+
+	// SendVideoNote is used to send rounded square mp4 videos of up to 1 minute long.
+	SendVideoNote(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface
