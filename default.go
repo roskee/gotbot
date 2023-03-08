@@ -137,3 +137,11 @@ func (b *bot) SendVoice(msg entity.MessageEnvelop) (entity.Message, error) {
 
 	return res, err
 }
+
+func (b *bot) SendMediaGroup(msg entity.MessageEnvelop) ([]entity.Message, error) {
+	var res []entity.Message
+
+	err := b.SendMessageAny(MessageMediaGroup, msg, &res)
+
+	return res, err
+}
