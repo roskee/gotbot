@@ -153,3 +153,11 @@ func (b *bot) SendVideoNote(msg entity.MessageEnvelop) (entity.Message, error) {
 
 	return res, err
 }
+
+func (b *bot) SendContact(msg entity.MessageEnvelop) (entity.Message, error) {
+	var res entity.Message
+
+	err := b.SendMessageAny(MessageContact, msg, &res)
+
+	return res, err
+}

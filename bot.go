@@ -102,6 +102,9 @@ type Bot interface {
 
 	// SendVideoNote is used to send rounded square mp4 videos of up to 1 minute long.
 	SendVideoNote(msg entity.MessageEnvelop) (entity.Message, error)
+
+	// SendContact is used to send phone contacts.
+	SendContact(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // bot is in-package implementation of the Bot interface
