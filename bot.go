@@ -105,6 +105,8 @@ type Bot interface {
 
 	// SendContact is used to send phone contacts.
 	SendContact(msg entity.MessageEnvelop) (entity.Message, error)
+	// GetUserProfilePhotos is used to get a list of profile pictures for a user.
+	GetUserProfilePhotos(options envelop.GetUserProfilePhotos) (entity.UserProfilePhotos, error)
 }
 
 // bot is in-package implementation of the Bot interface
