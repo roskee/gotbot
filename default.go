@@ -161,3 +161,16 @@ func (b *bot) SendContact(msg entity.MessageEnvelop) (entity.Message, error) {
 
 	return res, err
 }
+
+func (b *bot) GetUserProfilePhotos(options envelop.GetUserProfilePhotos) (entity.UserProfilePhotos, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "getUserProfilePhotos", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(options)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.UserProfilePhotos{}, err
+	}
+
+	var photos entity.UserProfilePhotos
+
+	return photos, json.Unmarshal(res, &photos)
+}
