@@ -174,3 +174,16 @@ func (b *bot) GetUserProfilePhotos(options envelop.GetUserProfilePhotos) (entity
 
 	return photos, json.Unmarshal(res, &photos)
 }
+
+func (b *bot) GetFile(getFile envelop.GetFile) (entity.File, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "getFile", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(getFile)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.File{}, err
+	}
+
+	var file entity.File
+
+	return file, json.Unmarshal(res, &file)
+}

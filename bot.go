@@ -13,6 +13,7 @@ import (
 )
 
 var apiString = "https://api.telegram.org/bot%s/%s"
+var apiFileString = "https://api.telegram.org/file/bot%s/%s"
 
 // Bot is a gateway to manage a telegram bot
 type Bot interface {
@@ -107,6 +108,11 @@ type Bot interface {
 	SendContact(msg entity.MessageEnvelop) (entity.Message, error)
 	// GetUserProfilePhotos is used to get a list of profile pictures for a user.
 	GetUserProfilePhotos(options envelop.GetUserProfilePhotos) (entity.UserProfilePhotos, error)
+	// GetFile is used to get basic info about a file and prepare it for downloading.
+	// For the moment, bots can download files of up to 20MB in size.
+	GetFile(options envelop.GetFile) (entity.File, error)
+	// DownloadFile downloads a file from the telegram server.
+	DownloadFile(file entity.File) ([]byte, error)
 }
 
 // bot is in-package implementation of the Bot interface
@@ -353,4 +359,14 @@ func (b *bot) executeUpdate(update entity.Update, config entity.UpdateConfig) {
 // SetLogger sets the logger of the bot.
 func (b *bot) SetLogger(logger Logger) {
 	b.logger = logger
+}
+
+func (b *bot) DownloadFile(file entity.File) ([]byte, error) {
+	res, err := http.DefaultClient.Get(fmt.Sprintf(apiFileString, b.apiKey, file.FilePath))
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	return io.ReadAll(res.Body)
 }
