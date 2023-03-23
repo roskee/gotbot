@@ -115,20 +115,36 @@ type Bot interface {
 	DownloadFile(file entity.File) ([]byte, error)
 }
 
+// BotOptions hold the options for the bot
+type BotOptions struct {
+	// Logger is the logger to use for logging
+	Logger Logger
+	// Client is the http client to use for sending requests
+	Client http.Client
+}
+
+func setDefaultOptions(o BotOptions) BotOptions {
+	if o.Logger == nil {
+		o.Logger = &JSONLogger{
+			TimeFormat: time.RFC3339,
+		}
+	}
+
+	return o
+}
+
 // bot is in-package implementation of the Bot interface
 type bot struct {
 	apiKey  string
 	methods []router.Handler
-	logger  Logger
+	options BotOptions
 }
 
 // NewBot returns a new bot with the token apiKey
-func NewBot(apiKey string) Bot {
+func NewBot(apiKey string, options BotOptions) Bot {
 	return &bot{
-		apiKey: apiKey,
-		logger: &JSONLogger{
-			TimeFormat: time.RFC3339,
-		},
+		apiKey:  apiKey,
+		options: setDefaultOptions(options),
 	}
 }
 
@@ -241,7 +257,7 @@ func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfi
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		// check token
 		if webhook.SecretToken != req.Header.Get("X-Telegram-Bot-Api-Secret-Token") {
-			b.logger.Warn("invalid secret token", Fields{
+			b.options.Logger.Warn("invalid secret token", Fields{
 				"token": req.Header.Get("X-Telegram-Bot-Api-Secret-Token"),
 			})
 			res.WriteHeader(http.StatusUnauthorized)
@@ -272,18 +288,18 @@ func (b *bot) Listen(port int, webhook entity.Webhook, config entity.UpdateConfi
 //
 // It returns on failure only
 func (b *bot) Poll(duration time.Duration, config entity.UpdateConfig) error {
-	b.logger.Info("deleting webhook if exists", Fields{})
+	b.options.Logger.Info("deleting webhook if exists", Fields{})
 
 	_, err := b.SendRawRequest(http.MethodPost, "deleteWebhook", nil, nil)
 	if err != nil {
-		b.logger.Error("error while deleting webhook", Fields{
+		b.options.Logger.Error("error while deleting webhook", Fields{
 			"error": err.Error(),
 		})
 
 		return err
 	}
 
-	b.logger.Info("Polling started", Fields{
+	b.options.Logger.Info("Polling started", Fields{
 		"duration": fmt.Sprintf("%fs", duration.Seconds()),
 	})
 
@@ -292,7 +308,7 @@ func (b *bot) Poll(duration time.Duration, config entity.UpdateConfig) error {
 		time.Sleep(duration)
 		updatesJSON, err := b.SendRawRequest(http.MethodGet, fmt.Sprintf("getUpdates?offset=%d", lastUpdate.UpdateID+1), nil, nil)
 		if err != nil {
-			b.logger.Error("Error while polling", Fields{
+			b.options.Logger.Error("Error while polling", Fields{
 				"error": err.Error(),
 			})
 
@@ -301,7 +317,7 @@ func (b *bot) Poll(duration time.Duration, config entity.UpdateConfig) error {
 		var updates []entity.Update
 		err = json.Unmarshal(updatesJSON, &updates)
 		if err != nil {
-			b.logger.Error("Error while polling", Fields{
+			b.options.Logger.Error("Error while polling", Fields{
 				"error": err.Error(),
 			})
 
@@ -318,7 +334,7 @@ func (b *bot) executeUpdate(update entity.Update, config entity.UpdateConfig) {
 	if update.Message != nil {
 		if command := update.Message.GetCommand(); command != "" {
 			b.executeMethod(command, update)
-			b.logger.Debug("command executed", Fields{
+			b.options.Logger.Debug("command executed", Fields{
 				"command": command,
 			})
 		}
@@ -350,7 +366,7 @@ func (b *bot) executeUpdate(update entity.Update, config entity.UpdateConfig) {
 			config.OnCallbackQuery(*update.CallbackQuery)
 		}
 	} else { // TODO: missing update types
-		b.logger.Warn("unknown update", Fields{
+		b.options.Logger.Warn("unknown update", Fields{
 			"update": update,
 		})
 	}
@@ -358,7 +374,7 @@ func (b *bot) executeUpdate(update entity.Update, config entity.UpdateConfig) {
 
 // SetLogger sets the logger of the bot.
 func (b *bot) SetLogger(logger Logger) {
-	b.logger = logger
+	b.options.Logger = logger
 }
 
 func (b *bot) DownloadFile(file entity.File) ([]byte, error) {
