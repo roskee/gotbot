@@ -175,7 +175,7 @@ func (b *bot) SendRawRequest(httpMethod, function string, getBody func() (io.Rea
 		}
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := b.options.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -378,7 +378,7 @@ func (b *bot) SetLogger(logger Logger) {
 }
 
 func (b *bot) DownloadFile(file entity.File) ([]byte, error) {
-	res, err := http.DefaultClient.Get(fmt.Sprintf(apiFileString, b.apiKey, file.FilePath))
+	res, err := b.options.Client.Get(fmt.Sprintf(apiFileString, b.apiKey, file.FilePath))
 	if err != nil {
 		return nil, err
 	}
