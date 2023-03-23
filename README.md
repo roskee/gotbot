@@ -35,7 +35,7 @@ you can use the `NewBot` function to connect your bot.
 
 ```go
 apiToken := os.Getenv("API_KEY")
-bot := gotbot.NewBot(apiToken)
+bot := gotbot.NewBot(apiToken, gotbot.BotOptions{})
 ```
 
 Then you can use the `RegisterMethod` to register your first command.  
