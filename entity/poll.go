@@ -34,8 +34,8 @@ type Poll struct {
 	//
 	// It is a required field
 	AllowsMultipleAnswers bool `json:"allows_multiple_answers"`
-	// CorrectOPtionID is  0-based identifier of the correct answer option.
-	CorrectOPtionID int64 `json:"correct_option_id"`
+	// CorrectOptionID is  0-based identifier of the correct answer option.
+	CorrectOptionID int64 `json:"correct_option_id"`
 	// Explanation is text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters
 	Explanation string `json:"explanation"`
 	// ExplanationEntities is special entities like usernames, URLs, bot commands, etc.

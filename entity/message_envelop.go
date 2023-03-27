@@ -127,8 +127,44 @@ type MessageEnvelop struct {
 	Contact
 
 	// All Parameters for sendPoll Method
-	Poll
 
+	// Question is poll question, 1-300 characters
+	//
+	// It is a required field for sending a poll.
+	Question string `json:"question"`
+	// Options is  list of poll options
+	//
+	// It is a required field for sending a poll.
+	Options []string `json:"options,omitempty"`
+	// IsAnonymous is true, if the poll is anonymous
+	//
+	// It is a required field for sending a poll.
+	IsAnonymous bool `json:"is_anonymous"`
+	// Type	is poll type, currently can be “regular” or “quiz”
+	//
+	// It is a required field for sending a poll.
+	Type string `json:"type"`
+	// AllowsMultipleAnswers is true, if the poll allows multiple answers
+	//
+	// It is a required field for sending a poll.
+	AllowsMultipleAnswers bool `json:"allows_multiple_answers"`
+	// CorrectOptionID is  0-based identifier of the correct answer option.
+	//
+	// Required for polls in the quiz mode.
+	CorrectOptionID int64 `json:"correct_option_id"`
+	// Explanation is text that is shown when a user chooses an incorrect answer
+	// or taps on the lamp icon in a quiz-style poll, 0-200 characters
+	Explanation string `json:"explanation"`
+	// ExplanationEntities is special entities like usernames, URLs, bot commands, etc.
+	ExplanationEntities []*MessageEntity `json:"explanation_entities"`
+	// OpenPeriod is amount of time in seconds the poll will be active after creation
+	// can't be used together with close_date
+	OpenPeriod int64 `json:"open_period"`
+	// CloseDate is point in time (Unix timestamp) when the poll will be automatically closed
+	// can't be used together with open_period
+	CloseDate int64 `json:"close_date"`
+	// IsClosed can be true, if the poll needs to be immediately closed
+	IsClosed bool `json:"is_closed"`
 	// All Parameters for sendDice Method
 	Dice
 

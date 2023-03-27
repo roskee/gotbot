@@ -187,3 +187,11 @@ func (b *bot) GetFile(getFile envelop.GetFile) (entity.File, error) {
 
 	return file, json.Unmarshal(res, &file)
 }
+
+func (b *bot) SendPoll(msg entity.MessageEnvelop) (entity.Message, error) {
+	var res entity.Message
+
+	err := b.SendMessageAny(MessagePoll, msg, &res)
+
+	return res, err
+}

@@ -113,6 +113,8 @@ type Bot interface {
 	GetFile(options envelop.GetFile) (entity.File, error)
 	// DownloadFile downloads a file from the telegram server.
 	DownloadFile(file entity.File) ([]byte, error)
+	// SendPoll is used to send a native poll.
+	SendPoll(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // BotOptions hold the options for the bot
@@ -382,7 +384,14 @@ func (b *bot) DownloadFile(file entity.File) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() {
+		err := res.Body.Close()
+		if err != nil {
+			b.options.Logger.Error("error while closing response body", Fields{
+				"error": err.Error(),
+			})
+		}
+	}()
 
 	return io.ReadAll(res.Body)
 }
