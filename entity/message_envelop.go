@@ -174,7 +174,7 @@ type MessageEnvelop struct {
 	// find_location for location data, record_video_note or upload_video_note for video notes.
 	//
 	// It is a required field for sending a chat action.
-	Action string `json:"action"`
+	Action ChatAction `json:"action"`
 }
 
 // FileEnvelop represents a file to be uploaded to the telegram server.

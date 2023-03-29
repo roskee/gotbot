@@ -195,3 +195,11 @@ func (b *bot) SendPoll(msg entity.MessageEnvelop) (entity.Message, error) {
 
 	return res, err
 }
+
+func (b *bot) SendChatAction(msg entity.MessageEnvelop) (bool, error) {
+	var res bool
+
+	err := b.SendMessageAny(MessageChatAction, msg, &res)
+
+	return res, err
+}
