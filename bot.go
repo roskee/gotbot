@@ -115,6 +115,9 @@ type Bot interface {
 	DownloadFile(file entity.File) ([]byte, error)
 	// SendPoll is used to send a native poll.
 	SendPoll(msg entity.MessageEnvelop) (entity.Message, error)
+	// SendChatAction is used to send a chat action.
+	SendChatAction(msg entity.MessageEnvelop) (bool, error)
+
 }
 
 // BotOptions hold the options for the bot
