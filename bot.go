@@ -117,7 +117,9 @@ type Bot interface {
 	SendPoll(msg entity.MessageEnvelop) (entity.Message, error)
 	// SendChatAction is used to send a chat action.
 	SendChatAction(msg entity.MessageEnvelop) (bool, error)
-
+	// SendAnimation is used to send animation files.
+	// For the moment, bots can send animation files of up to 50 MB in size.
+	SendAnimation(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // BotOptions hold the options for the bot
