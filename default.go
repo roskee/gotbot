@@ -203,3 +203,11 @@ func (b *bot) SendChatAction(msg entity.MessageEnvelop) (bool, error) {
 
 	return res, err
 }
+
+func (b *bot) SendAnimation(msg entity.MessageEnvelop) (entity.Message, error) {
+	var res entity.Message
+
+	err := b.SendMessageAny(MessageAnimation, msg, &res)
+
+	return res, err
+}
