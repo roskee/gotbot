@@ -165,8 +165,11 @@ type MessageEnvelop struct {
 	CloseDate int64 `json:"close_date"`
 	// IsClosed can be true, if the poll needs to be immediately closed
 	IsClosed bool `json:"is_closed"`
+
 	// All Parameters for sendDice Method
-	Dice
+
+	// Emoji on which the dice throw animation is based.
+	Emoji string `json:"emoji,omitempty"`
 
 	// Action is type of action to broadcast. Choose one, depending on what the user is about to receive.
 	// typing for text messages, upload_photo for photos, record_video or upload_video for videos,
