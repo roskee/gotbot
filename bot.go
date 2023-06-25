@@ -120,6 +120,8 @@ type Bot interface {
 	// SendAnimation is used to send animation files.
 	// For the moment, bots can send animation files of up to 50 MB in size.
 	SendAnimation(msg entity.MessageEnvelop) (entity.Message, error)
+	// SendDice is used to send an animated emoji that will display a random value.
+	SendDice(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // BotOptions hold the options for the bot
