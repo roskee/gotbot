@@ -122,6 +122,8 @@ type Bot interface {
 	SendAnimation(msg entity.MessageEnvelop) (entity.Message, error)
 	// SendDice is used to send an animated emoji that will display a random value.
 	SendDice(msg entity.MessageEnvelop) (entity.Message, error)
+	// SendVenue is used to send information about a venue.
+	SendVenue(msg entity.MessageEnvelop) (entity.Message, error)
 }
 
 // BotOptions hold the options for the bot

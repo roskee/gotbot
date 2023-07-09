@@ -178,6 +178,21 @@ type MessageEnvelop struct {
 	//
 	// It is a required field for sending a chat action.
 	Action ChatAction `json:"action"`
+
+	// All Parameters for sendVenue method
+
+	// Address of the venue
+	Address string `json:"address,omitempty"`
+	// FoursquareID of the venue
+	FoursquareID string `json:"foursquare_id,omitempty"`
+	// FoursquareType of the venue, if known.
+	// (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
+	FoursquareType string `json:"foursquare_type,omitempty"`
+	// GooglePlaceID of the venue
+	GooglePlaceID string `json:"google_place_id,omitempty"`
+	// GooglePlaceType of the venue.
+	// See supported types at https://developers.google.com/places/web-service/supported_types
+	GooglePlaceType string `json:"google_place_type,omitempty"`
 }
 
 // FileEnvelop represents a file to be uploaded to the telegram server.
