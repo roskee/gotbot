@@ -39,6 +39,9 @@ type Bot interface {
 	// SetMyCommands is the implementation of the builtin setMyCommands function of the bot.
 	SetMyCommands(commands []entity.Command) error
 
+	// DeleteMyCommands is the implementation of the builtin deleteMyCommands function of the bot.
+	DeleteMyCommands(commandScope envelop.DeleteMyCommandsEnvelop) (bool, error)
+
 	// GetMe is the implementation of the builtin getMe function of the bot
 	GetMe() (entity.User, error)
 

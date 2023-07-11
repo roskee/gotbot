@@ -48,6 +48,18 @@ func (b *bot) SetMyCommands(commands []entity.Command) error {
 	return nil
 }
 
+func (b *bot) DeleteMyCommands(commandScope envelop.DeleteMyCommandsEnvelop) (bool, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "deleteMyCommands", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(commandScope)
+	}, SetApplicationJSON)
+	if err != nil {
+		return false, err
+	}
+	var success bool
+
+	return success, json.Unmarshal(res, &success)
+}
+
 // SendMessage is the implementation of the builtin sendMessage function of the bot.
 // It sends the given message to the sender user
 func (b *bot) SendMessage(message entity.MessageEnvelop) (entity.Message, error) {

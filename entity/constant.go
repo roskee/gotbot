@@ -27,3 +27,22 @@ const (
 	// ChatActionUploadVideoNote is for upload video note action.
 	ChatActionUploadVideoNote ChatAction = "upload_video_note"
 )
+
+type BotCommandScopeType string
+
+const (
+	// BotCommandScopeDefault is the default scope.
+	BotCommandScopeDefault BotCommandScopeType = "default"
+	// BotCommandScopeAllPrivateChats is the all private chats scope.
+	BotCommandScopeAllPrivateChats BotCommandScopeType = "all_private_chats"
+	// BotCommandScopeAllGroupChats is the all group chats scope.
+	BotCommandScopeAllGroupChats BotCommandScopeType = "all_group_chats"
+	// BotCommandScopeAllChatAdministrators is the all chat administrators scope.
+	BotCommandScopeAllChatAdministrators BotCommandScopeType = "all_chat_administrators"
+	// BotCommandScopeChat is the chat scope.
+	BotCommandScopeChat BotCommandScopeType = "chat"
+	// BotCommandScopeChatAdministrators is the chat administrators scope.
+	BotCommandScopeChatAdministrators BotCommandScopeType = "chat_administrators"
+	// BotCommandScopeChatMember is the chat member scope.
+	BotCommandScopeChatMember BotCommandScopeType = "chat_member"
+)
