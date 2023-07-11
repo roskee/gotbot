@@ -33,3 +33,20 @@ func (c *Command) ToJSONBody() []byte {
 	}
 	return bytes
 }
+
+// BotCommandScope describes the scope of bot commands,
+type BotCommandScope struct {
+	// Type is the type of scope.
+	//
+	// It is a required field.
+	Type BotCommandScopeType `json:"type,omitempty"`
+	// ChatID is the unique identifier for the target chat
+	// or username of the target supergroup.
+	//
+	// It is a required field if Type is chat, chat_administrators or chat_member.
+	ChatID string `json:"chat_id,omitempty"`
+	// UserID is the unique identifier of the target user.
+	//
+	// It is a required field if Type is chat_member.
+	UserID int64 `json:"user_id,omitempty"`
+}
