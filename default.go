@@ -239,3 +239,16 @@ func (b *bot) SendVenue(msg entity.MessageEnvelop) (entity.Message, error) {
 
 	return res, err
 }
+
+func (b *bot) SetChatAdministratorCustomTitle(title envelop.SetChatAdministratorCustomTitle) (bool, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "setChatAdministratorCustomTitle", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(title)
+	}, SetApplicationJSON)
+	if err != nil {
+		return false, err
+	}
+
+	var status bool
+
+	return status, json.Unmarshal(res, &status)
+}

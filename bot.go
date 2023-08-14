@@ -127,6 +127,9 @@ type Bot interface {
 	SendDice(msg entity.MessageEnvelop) (entity.Message, error)
 	// SendVenue is used to send information about a venue.
 	SendVenue(msg entity.MessageEnvelop) (entity.Message, error)
+	// SetChatAdministratorCustomTitle is used to set a custom title for an administrator
+	// in a supergroup promoted by the bot.
+	SetChatAdministratorCustomTitle(title envelop.SetChatAdministratorCustomTitle) (bool, error)
 }
 
 // BotOptions hold the options for the bot
