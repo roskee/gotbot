@@ -130,6 +130,28 @@ type Bot interface {
 	// SetChatAdministratorCustomTitle is used to set a custom title for an administrator
 	// in a supergroup promoted by the bot.
 	SetChatAdministratorCustomTitle(title envelop.SetChatAdministratorCustomTitle) (bool, error)
+	// EditMessageText is used to edit text and game messages.
+	EditMessageText(msg envelop.EditMessageTextEnvelop) (entity.Message, error)
+	// EditMessageCaption is used to edit captions of messages.
+	EditMessageCaption(msg envelop.EditMessageCaptionEnvelop) (entity.Message, error)
+	// EditMessageMedia is used to edit animation, audio, document, photo, or video messages.
+	EditMessageMedia(msg envelop.EditMessageMediaEnvelop) (entity.Message, error)
+	// EditMessageLiveLocation is used to edit live location messages.
+	EditMessageLiveLocation(msg envelop.EditMessageLiveLocationEnvelop) (entity.Message, error)
+	// StopMessageLiveLocation is used to stop updating a live location message before live_period expires.
+	StopMessageLiveLocation(msg envelop.StopMessageLiveLocationEnvelop) (entity.Message, error)
+	// EditMessageReplyMarkup is used to edit only the reply markup of messages.
+	EditMessageReplyMarkup(msg envelop.EditMessageReplyMarkupEnvelop) (entity.Message, error)
+	// StopPoll is used to stop a poll which was sent by the bot.
+	StopPoll(msg envelop.StopPollEnvelop) (entity.Poll, error)
+	// DeleteMessage is used to delete a message, including service messages, with the following limitations:
+	// - A message can only be deleted if it was sent less than 48 hours ago.
+	// - Bots can delete outgoing messages in private chats, groups, and supergroups.
+	// - Bots can delete incoming messages in private chats.
+	// - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+	// - If the bot is an administrator of a group, it can delete any message there.
+	// - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+	DeleteMessage(msg envelop.DeleteMessageEnvelop) (bool, error)
 }
 
 // BotOptions hold the options for the bot

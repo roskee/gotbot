@@ -252,3 +252,107 @@ func (b *bot) SetChatAdministratorCustomTitle(title envelop.SetChatAdministrator
 
 	return status, json.Unmarshal(res, &status)
 }
+
+func (b *bot) EditMessageText(msg envelop.EditMessageTextEnvelop) (entity.Message, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "editMessageText", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msg)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var message entity.Message
+
+	return message, json.Unmarshal(res, &message)
+}
+
+func (b *bot) EditMessageCaption(msg envelop.EditMessageCaptionEnvelop) (entity.Message, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "editMessageCaption", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msg)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var message entity.Message
+
+	return message, json.Unmarshal(res, &message)
+}
+
+func (b *bot) EditMessageMedia(msg envelop.EditMessageMediaEnvelop) (entity.Message, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "editMessageMedia", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msg)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var message entity.Message
+
+	return message, json.Unmarshal(res, &message)
+}
+
+func (b *bot) EditMessageLiveLocation(msg envelop.EditMessageLiveLocationEnvelop) (entity.Message, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "editMessageLiveLocation", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msg)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var message entity.Message
+
+	return message, json.Unmarshal(res, &message)
+}
+
+func (b *bot) StopMessageLiveLocation(msg envelop.StopMessageLiveLocationEnvelop) (entity.Message, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "stopMessageLiveLocation", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msg)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var message entity.Message
+
+	return message, json.Unmarshal(res, &message)
+}
+
+func (b *bot) EditMessageReplyMarkup(msg envelop.EditMessageReplyMarkupEnvelop) (entity.Message, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "editMessageReplyMarkup", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msg)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var message entity.Message
+
+	return message, json.Unmarshal(res, &message)
+}
+
+func (b *bot) StopPoll(msg envelop.StopPollEnvelop) (entity.Poll, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "stopPoll", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msg)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Poll{}, err
+	}
+
+	var poll entity.Poll
+
+	return poll, json.Unmarshal(res, &poll)
+}
+
+func (b *bot) DeleteMessage(msg envelop.DeleteMessageEnvelop) (bool, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "deleteMessage", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(msg)
+	}, SetApplicationJSON)
+	if err != nil {
+		return false, err
+	}
+
+	var status bool
+
+	return status, json.Unmarshal(res, &status)
+}
