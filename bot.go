@@ -91,7 +91,6 @@ type Bot interface {
 	// SendDocument is used to send general files.
 	//
 	// Note: bots can only send files of any type up to 50 MB in size.
-
 	SendDocument(msg entity.MessageEnvelop) (entity.Message, error)
 	// SendVoice is used to send audio files.
 	//
@@ -152,6 +151,9 @@ type Bot interface {
 	// - If the bot is an administrator of a group, it can delete any message there.
 	// - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
 	DeleteMessage(msg envelop.DeleteMessageEnvelop) (bool, error)
+
+	// SendInvoice is used to send invoices.
+	SendInvoice(invoice envelop.SendInvoiceEnvelop) (entity.Message, error)
 }
 
 // BotOptions hold the options for the bot
