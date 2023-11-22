@@ -356,3 +356,16 @@ func (b *bot) DeleteMessage(msg envelop.DeleteMessageEnvelop) (bool, error) {
 
 	return status, json.Unmarshal(res, &status)
 }
+
+func (b *bot) SendInvoice(invoice envelop.SendInvoiceEnvelop) (entity.Message, error) {
+	res, err := b.SendRawRequest(http.MethodPost, "sendInvoice", func() (io.Reader, BodyOptions, error) {
+		return GetJSONBody(invoice)
+	}, SetApplicationJSON)
+	if err != nil {
+		return entity.Message{}, err
+	}
+
+	var msg entity.Message
+
+	return msg, json.Unmarshal(res, &msg)
+}
